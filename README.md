@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+This project is a collab between [Justin](https://github.com/jduong09) and [Dan](https://github.com/ziggysauce).
+
 ## Available Scripts
 
 In the project directory, you can run:
