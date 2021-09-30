@@ -2,6 +2,10 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const client_id = 'CLIENT_ID';
+  const client_secret = 'CLIENT_SECRET';
+  const redirect_uri = 'REDIRECT_URI'; 
+  const getSongFromApi = fetch('http');
   return (
     <div className="App">
       <header className="App-header">
