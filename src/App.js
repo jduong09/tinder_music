@@ -4,8 +4,25 @@ import './App.css';
 function App() {
   const client_id = 'CLIENT_ID';
   const client_secret = 'CLIENT_SECRET';
-  const redirect_uri = 'REDIRECT_URI'; 
-  const getSongFromApi = fetch('http');
+  const baseencodedClientCredentials = btoa(`${client_id}:${client_secret}`);
+  const url = 'https://accounts.spotify.com/api/token';
+
+  const myHeaders = new Headers();
+  myHeaders.append('Authorization', `Basic ${baseencodedClientCredentials}`);
+  myHeaders.append('Content-Type', 'application/x-www-form-urlencoded')
+  
+  const authorizeUser = () => { 
+    let access_token = fetch(url, {
+      method: 'POST',
+      headers: myHeaders,
+      body: 'grant_type=client_credentials'
+    })
+      .then(data => data.json())
+      .then(res => res.access_token);
+  };
+
+  console.log(authorizeUser());
+
   return (
     <div className="App">
       <header className="App-header">
