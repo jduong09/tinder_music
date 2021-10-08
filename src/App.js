@@ -12,16 +12,24 @@ function App() {
   myHeaders.append('Content-Type', 'application/x-www-form-urlencoded')
   
   const authorizeUser = () => { 
-    let access_token = fetch(url, {
+    fetch(url, {
       method: 'POST',
       headers: myHeaders,
       body: 'grant_type=client_credentials'
     })
       .then(data => data.json())
-      .then(res => res.access_token);
+      .then(res => res.access_token).then(accessToken => 
+      fetch("https://api.spotify.com/v1/tracks/3n3Ppam7vgaVa1iaRUc9Lp", {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json',
+        }
+      }).then(finalData => finalData.json()).then(res => console.log(res))
+    )
   };
 
-  console.log(authorizeUser());
+  authorizeUser();
 
   return (
     <div className="App">
