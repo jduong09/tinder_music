@@ -25,10 +25,49 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      window.onSpotifyWebPlaybackSDKReady = () => {
+          const token = "BQCu-YSP7WtrntiELA6qFw3SNcGvxVwcyiNEHqOZfQcQtzWIc1kjNdACDZLpFzG7NtrS7tmbKsLF2HX8ZS2BR7mH04aiaseg8QgLmoyMOvttHBEeb5KK6ye7-MHbahGOkr-mO77nE3zCzLiweLWs3Cs_o9OrS_UNLrj_jq55bJAxEd1-z2ol-dc";
+          const player = new Spotify.Player({
+              name: 'Web Playback SDK Quick Start Player',
+              getOAuthToken: cb => { cb(token); },
+              volume: 0.5
+          });
+
+          // Ready
+          player.addListener('ready', ({ device_id }) => {
+              console.log('Ready with Device ID', device_id);
+          });
+
+          // Not Ready
+          player.addListener('not_ready', ({ device_id }) => {
+              console.log('Device ID has gone offline', device_id);
+          });
+
+          player.addListener('initialization_error', ({ message }) => {
+              console.error(message);
+          });
+
+          player.addListener('authentication_error', ({ message }) => {
+              console.error(message);
+          });
+
+          player.addListener('account_error', ({ message }) => {
+              console.error(message);
+          });
+
+          document.getElementById('togglePlay').onclick = function() {
+            player.togglePlay();
+          };
+
+          player.connect();
+      }
+    </script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
