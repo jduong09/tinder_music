@@ -1,27 +1,26 @@
-import logo from './logo.svg';
 import './App.css';
-import Song from './components/song.jsx';
+import WebPlayback from './components/webPlayback.jsx';
 import Login from './components/auth/login.js';
+import { useState, useEffect } from 'react';
 
 function App() {
+
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    async function getToken() {
+      const response = await fetch('/auth/token');
+      const json = await response.json();
+      console.log(json);
+      setToken(json.access_token);
+    }
+
+    getToken();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Hello there are changes. Test.
-        </a>
-      </header>
-      <Song />
-      <Login />
+      { (token === '') ? <Login /> : <WebPlayback token={token} /> }
     </div>
   );
 }
