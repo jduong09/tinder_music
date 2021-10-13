@@ -1,7 +1,4 @@
 import React from 'react';
-import Script from 'react-load-script'
-
-import { createListeners } from '../utils/spotify_web_playback_sdk';
 
 class Song extends React.Component {
   constructor(props) {
@@ -19,31 +16,33 @@ class Song extends React.Component {
   };
 
   authenticateUser() {
-    const client_id = 'client_id';
-    const client_secret = 'client_secret';
-    const baseencodedClientCredentials = btoa(`${client_id}:${client_secret}`);
-    const url = 'https://accounts.spotify.com/api/token';
-    const myHeaders = new Headers();
-    myHeaders.append('Authorization', `Basic ${baseencodedClientCredentials}`);
-    myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
+    //const baseencodedClientCredentials = btoa(`${client_id}:${client_secret}`);
+    //const myHeaders = new Headers();
+    //myHeaders.append('Authorization', `Basic ${baseencodedClientCredentials}`);
+    //myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
     const searchParams = new URLSearchParams({
-      scope: ["streaming", "user-read-email", "user-read-private"],
-      grant_type: 'client_credentials'
+      scope: ["streaming", "user-read-email", "user-read-private", "user-read-playback-state", "user-modify-playback-state", "user-read-currently-playing"],
+      redirect_uri: 'http://localhost:3000/auth/callback',
+      response_type: 'token',
+      client_id: client_id
     });
 
-    this.requestAccessToken(url, myHeaders, searchParams);
+    const url = 'https://accounts.spotify.com/authorize/?' + searchParams.toString();
+    this.requestAccessToken(url);
   };
 
-  requestAccessToken(url, myHeaders, searchParams) {
+  requestAccessToken(url) {
     fetch(url, {
-      method: 'POST',
-      headers: myHeaders,
-      body: searchParams
-    })
+      mode: 'cors'
+    }).then(data => console.log(data), error => console.log(error));
+    /*
     .then(data => data.json())
-    .then(res => res.access_token)
+    .then(res => {
+      console.log(res);
+      window.accessToken = res.access_token;
+      return res.access_token;
+    })
     .then(accessToken => {
-      this.initializeSpotifyWebPlayer(accessToken);
       return fetch("https://api.spotify.com/v1/tracks/3n3Ppam7vgaVa1iaRUc9Lp", {
         method: 'GET',
         headers: { 
@@ -55,6 +54,7 @@ class Song extends React.Component {
     .then(finalData => finalData.json())
     .then(res => ({ name: res.name, artist: res.artists[0].name, album: res.album.name }))
     .then(response => this.setState({ name: response.name, artist: response.artist, album: response.album }));
+  */
   };
 
   
@@ -66,7 +66,6 @@ class Song extends React.Component {
   render() {
     return (
       <div>
-        <button id="togglePlay">Toggle Play</button>
         <button onClick={this.authenticateUser}>Log In</button>
         <ul>
           <li>Name:{this.state.name}</li>

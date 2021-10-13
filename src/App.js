@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Song from './components/song.jsx';
+import Login from './components/auth/login.js';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         </a>
       </header>
       <Song />
+      <Login />
     </div>
   );
 }
