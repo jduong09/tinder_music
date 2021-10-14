@@ -1,4 +1,4 @@
-import './App.css';
+import './css/App.css';
 import WebPlayback from './components/webPlayback.jsx';
 import Login from './components/auth/login.js';
 import { useState, useEffect } from 'react';
@@ -11,7 +11,6 @@ function App() {
     async function getToken() {
       const response = await fetch('/auth/token');
       const json = await response.json();
-      console.log(json);
       setToken(json.access_token);
     }
 
@@ -19,9 +18,12 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <main className="App">
+      <header>
+        <h1>Tinder Music</h1>
+      </header>
       { (token === '') ? <Login /> : <WebPlayback token={token} /> }
-    </div>
+    </main>
   );
 }
 

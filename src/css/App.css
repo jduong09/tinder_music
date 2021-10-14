@@ -24,10 +24,6 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +31,19 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+h1 {
+  font-size: 32px;
+  color: green;
+}
+
+.login > a {
+  border: 1px solid gray;
+  border-radius: 5px;
+  color: green;
+  background-color: gray;
+  font-size: 18px;
+  padding: 10px;
+  text-decoration: none;
 }

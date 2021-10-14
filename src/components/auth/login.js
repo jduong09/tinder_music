@@ -1,7 +1,9 @@
 import React from 'react';
 
 const Login = () => (
-  <div><a href="/auth/login">AuthenticateUser</a></div>
+  <section className="login">
+    <a href="/auth/login">Login with Spotify Account</a>
+  </section>
 )
 
 export default Login;
