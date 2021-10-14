@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { render } from 'react-dom';
+import React from 'react';
 
 const track = {
   name: "",
@@ -18,15 +17,21 @@ class WebPlayback extends React.Component {
   constructor(props) {
     super(props);
 
-    const [is_paused, setPaused] = useState(false);
-    const [is_active, setActive] = useState(false);
-    const [player, setPlayer] = useState(undefined);
-    const [prev_track, setPrevTrack] = useState(false);
-    const [current_track, setTrack] = useState(track);
-    const [next_track, setNextTrack] = useState(track);
-  };
+    this.state = {
+      is_paused: false,
+      is_active: false,
+      player: undefined,
+      is_playing_left_track: true,
+      left_side_track: track,
+      right_side_track: track,
+      previous_track: false
+    }
 
-  useEffect() { () => {
+    this.handlePrevSong = this.handlePrevSong.bind(this);
+    this.handleNextSong = this.handleNextSong.bind(this);
+  }
+
+  componentDidMount() {
     const script = document.createElement("script");
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
@@ -35,43 +40,62 @@ class WebPlayback extends React.Component {
     window.onSpotifyWebPlaybackSDKReady = () => {
       const player = new window.Spotify.Player({
         name: 'Web Playback SDK',
-        getOAuthToken: cb => cb(token),
+        getOAuthToken: cb => cb(this.props.token),
         volume: 0.5
       });
 
-      setPlayer(player);
+      this.setState({ player: player });
       
-      player.addListener('ready', ({ device_id }) => {
+      this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
       });
 
-      player.addListener('not_ready', ({ device_id }) => {
+      this.state.player.addListener('not_ready', ({ device_id }) => {
         console.log('Device ID has gone offline', device_id);
       });
 
-      player.addListener('player_state_changed', ( state => {
+      this.state.player.addListener('player_state_changed', ( state => {
         if (!state) {
           return;
         }
 
-        setTrack(state.track_window.current_track);
-        setNextTrack(state.track_window.next_tracks[0]);
+        if (this.state.is_playing_left_track) {
+          this.setState({ left_side_track: state.track_window.current_track, right_side_track: state.track_window.next_tracks[0], is_paused: state.paused });
+        } else {
+          this.setState({ left_side_track: state.track_window.previous_tracks[1], right_side_track: state.track_window.current_track, is_paused: state.paused });
+        }
 
-        setPaused(state.paused);
-
-        player.getCurrentState().then( state => {
-          (!state) ? setActive(false) : setActive(true);
+        this.state.player.getCurrentState().then( state => {
+          (!state) ? this.setState({ is_active: false }) : this.setState({ is_active: true });
         });
       }));
 
-      player.connect();
+      this.state.player.connect();
     };
-  }, [token])
   };
+  
+  handlePrevSong() {
+    if (!this.state.is_playing_left_track) {
+      this.state.player.previousTrack();
+      this.setState({ is_playing_left_track: true });
+    } else {
+      this.state.player.previousTrack();
+      this.setState({ is_playing_left_track: false });
+    }
+  }
 
+  handleNextSong() {
+    if (this.state.is_playing_left_track) {
+      this.state.player.nextTrack();
+      this.setState({ is_playing_left_track: false });
+    } else {
+      this.state.player.nextTrack();
+      this.setState({ is_playing_left_track: true });
+    }
+  }
 
   render() {
-    if (!is_active) {
+    if (!this.state.is_active) {
       return (
         <div>
           <b>Instance not active. Transfer your playback using your Spotify Connect.</b>
@@ -98,39 +122,29 @@ class WebPlayback extends React.Component {
             <div className="main-wrapper">
           
               <section className="left-side_player">
-                <img src={current_track.album.images[0].url} className="now-playing__cover" alt="" />
-                <div className="now-playing__name">{prev_track ? prev_track.name : current_track.name}</div>
-                <div className="now-playing__artist">{prev_track ? "hello" : current_track.artists[0].name}</div>
-
-                <button className="btn-spotify" onClick={() => { player.previousTrack() }} >
-                    &lt;&lt;
-                </button>
-
-                <button className="btn-spotify" onClick={() => { player.togglePlay() }} >
-                  { is_paused ? "PLAY" : "PAUSE" }
-                </button>
-
-                <button className="btn-spotify" onClick={() => { player.nextTrack() }} >
-                    &gt;&gt;
-                </button>
+                <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />
+                <div className="now-playing__name">{this.state.left_side_track.name}</div>
+                <div className="now-playing__artist">{this.state.left_side_track.artists[0].name}</div>
               </section>
 
               <section className="right-side_player">
-                <img src={next_track.album.images[0].url} className="now-playing__cover" alt="" />
-                <div className="now-playing__name">{prev_track ? current_track.name : next_track.name}</div>
-                <div className="now-playing__artist">{prev_track? current_track.artists[0].name : next_track.artists[0].name}</div>
+                <img src={this.state.right_side_track.album.images[0].url} className="now-playing__cover" alt="" />
+                <div className="now-playing__name">{this.state.right_side_track.name}</div>
+                <div className="now-playing__artist">{this.state.right_side_track.artists[0].name}</div>
+              </section>
 
-                <button className="btn-spotify" onClick={() => { player.previousTrack() }} >
-                    &lt;&lt;
-                </button>
+              <section className="player-buttons">
+                <button className="btn-spotify" onClick={this.handlePrevSong} >
+                      Listen To Left Song
+                  </button>
 
-                <button className="btn-spotify" onClick={() => { player.togglePlay() }} >
-                  { is_paused ? "PLAY" : "PAUSE" }
-                </button>
+                  <button className="btn-spotify" onClick={() => { this.state.player.togglePlay() }} >
+                    { this.state.is_paused ? "PLAY" : "PAUSE" }
+                  </button>
 
-                <button className="btn-spotify" onClick={() => { player.nextTrack() }} >
-                    &gt;&gt;
-                </button>
+                  <button className="btn-spotify" onClick={this.handleNextSong} >
+                      Listen To Right Song
+                  </button>
               </section>
             </div>
         </main>
