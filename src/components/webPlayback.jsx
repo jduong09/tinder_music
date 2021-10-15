@@ -121,13 +121,13 @@ class WebPlayback extends React.Component {
         <main className="container">
             <div className="main-wrapper">
           
-              <section className="left-side_player">
+              <section className="player-display">
                 <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />
                 <div className="now-playing__name">{this.state.left_side_track.name}</div>
                 <div className="now-playing__artist">{this.state.left_side_track.artists[0].name}</div>
               </section>
 
-              <section className="right-side_player">
+              <section className="player-display">
                 <img src={this.state.right_side_track.album.images[0].url} className="now-playing__cover" alt="" />
                 <div className="now-playing__name">{this.state.right_side_track.name}</div>
                 <div className="now-playing__artist">{this.state.right_side_track.artists[0].name}</div>
