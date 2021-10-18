@@ -1,21 +1,22 @@
 const express = require('express');
 const request = require('request');
+require('dotenv').config();
 
 const port = 5000;
 
 global.access_token = '';
 
-const spotify_client_id = 'd63fc97ff8f84a7bb58d1d9cf73ecfed';
-const spotify_client_secret = 'a2d83594e53642be961588d675d12828';
-const spotify_redirect_uri = 'http://localhost:3000/auth/callback';
+const spotify_client_id = process.env.spotifyClientId;
+const spotify_client_secret = process.env.spotifyClientSecret;
+const spotify_redirect_uri = process.env.spotifyRedirectUri;
 
 let app = express();
 
 app.get('/auth/login', (req, res) => {
-  let scope = 'streaming user-read-email user-read-private';
+  const scope = 'streaming user-read-email user-read-private';
 
-  let searchParams = new URLSearchParams({
-    response_type: "code",
+  const searchParams = new URLSearchParams({
+    response_type: 'code',
     client_id: spotify_client_id,
     scope: scope,
     redirect_uri: spotify_redirect_uri
@@ -25,12 +26,12 @@ app.get('/auth/login', (req, res) => {
 });
 
 app.get('/auth/callback', (req, res) => {
-  let code = req.query.code;
+  const code = req.query.code;
 
-  let authOptions = {
+  const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     form: {
-      code: code,
+      code,
       redirect_uri: spotify_redirect_uri,
       grant_type: 'authorization_code'
     },

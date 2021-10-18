@@ -4,11 +4,11 @@ const track = {
   name: "",
   album: {
     images: [
-      { url: "" }
+      { url: '' }
     ]
   },
   artists: [
-    { name: "" }
+    { name: '' }
   ]
 };
 
@@ -32,19 +32,20 @@ class WebPlayback extends React.Component {
   }
 
   componentDidMount() {
+
     const script = document.createElement("script");
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      const player = new window.Spotify.Player({
+      const spotifyPlayer = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: cb => cb(this.props.token),
         volume: 0.5
       });
 
-      this.setState({ player: player });
+      this.setState({ player: spotifyPlayer });
       
       this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
@@ -59,12 +60,17 @@ class WebPlayback extends React.Component {
           return;
         }
 
-        if (this.state.is_playing_left_track) {
-          this.setState({ left_side_track: state.track_window.current_track, right_side_track: state.track_window.next_tracks[0], is_paused: state.paused });
-        } else {
-          this.setState({ left_side_track: state.track_window.previous_tracks[1], right_side_track: state.track_window.current_track, is_paused: state.paused });
-        }
+        const {
+          paused,
+          track_window: { current_track, next_tracks, previous_tracks }
+        } = state;
 
+        this.setState({
+          left_side_track: this.state.is_playing_left_track ? current_track : previous_tracks[1],
+          right_side_track: this.state.is_playing_left_track ? next_tracks[0] : current_track,
+          is_paused: paused
+        });
+        
         this.state.player.getCurrentState().then( state => {
           (!state) ? this.setState({ is_active: false }) : this.setState({ is_active: true });
         });
@@ -75,23 +81,13 @@ class WebPlayback extends React.Component {
   };
   
   handlePrevSong() {
-    if (!this.state.is_playing_left_track) {
-      this.state.player.previousTrack();
-      this.setState({ is_playing_left_track: true });
-    } else {
-      this.state.player.previousTrack();
-      this.setState({ is_playing_left_track: false });
-    }
+    this.state.player.previousTrack();
+    this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
   }
 
   handleNextSong() {
-    if (this.state.is_playing_left_track) {
-      this.state.player.nextTrack();
-      this.setState({ is_playing_left_track: false });
-    } else {
-      this.state.player.nextTrack();
-      this.setState({ is_playing_left_track: true });
-    }
+    this.state.player.nextTrack();
+    this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
   }
 
   render() {
@@ -100,23 +96,8 @@ class WebPlayback extends React.Component {
         <div>
           <b>Instance not active. Transfer your playback using your Spotify Connect.</b>
         </div>
-      )
+      );
     } else {
-      /*
-      When user first sees webpage:
-        Show user two songs. When user hits play. Play the one on the left.
-        User can choose to play next one, and also go back to the previous one.
-        User chooses which song they like more
-        Show user two brand new songs.
-      
-      Code:
-        Need a current_track (song currently playing).
-        Need next_track (song on the right).
-        need prev_track (for when user is listening to song on the right, they can choose to go back to the previous song.)
-        Need button to play song.
-        Need button to choose next and go back a song.
-        Need button to for user to choose a song they like. Would go into a playlist to show at the end!
-      */
       return (
         <main className="container">
             <div className="main-wrapper">

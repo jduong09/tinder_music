@@ -4,6 +4,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 This project is a collaboration between [Justin](https://github.com/jduong09) and [Dan](https://github.com/ziggysauce).
 
+## To Start App
+
+Navigate to root folder after downloading:
+Run `npm install` to install dependencies
+Run `npm run-script server` to start proxy server
+
+In a separate terminal as proxy server:
+Run `npm start` to start app. 
+Go to available devices in spotify app and select 'Web Playback SDK'.
+
 ## Available Scripts
 
 In the project directory, you can run:
