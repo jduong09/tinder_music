@@ -1,7 +1,7 @@
 import React from 'react';
 
 const track = {
-  name: "",
+  name: '',
   album: {
     images: [
       { url: '' }
@@ -47,8 +47,11 @@ class WebPlayback extends React.Component {
 
       this.setState({ player: spotifyPlayer });
       
+      // When the device is online and ready
+      // run a post request to transfer the user's playback state to our device.
       this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
+        fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id}));
       });
 
       this.state.player.addListener('not_ready', ({ device_id }) => {
