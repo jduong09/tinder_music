@@ -12,7 +12,6 @@ const track = {
   ]
 };
 
-
 class WebPlayback extends React.Component {
   constructor(props) {
     super(props);
@@ -42,7 +41,7 @@ class WebPlayback extends React.Component {
       const spotifyPlayer = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: cb => cb(this.props.token),
-        volume: 0.5
+        volume: 0.3
       });
 
       this.setState({ player: spotifyPlayer });
@@ -51,7 +50,11 @@ class WebPlayback extends React.Component {
       // run a post request to transfer the user's playback state to our device.
       this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
-        fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id}));
+        async function transferPlayback() {
+          await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
+          return await fetch('/auth/user');
+        };
+        transferPlayback();
       });
 
       this.state.player.addListener('not_ready', ({ device_id }) => {
@@ -78,7 +81,6 @@ class WebPlayback extends React.Component {
           (!state) ? this.setState({ is_active: false }) : this.setState({ is_active: true });
         });
       }));
-
       this.state.player.connect();
     };
   };
@@ -93,6 +95,9 @@ class WebPlayback extends React.Component {
     this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
   }
 
+  handleChoice() {
+  }
+
   render() {
     if (!this.state.is_active) {
       return (
@@ -105,13 +110,13 @@ class WebPlayback extends React.Component {
         <main className="container">
             <div className="main-wrapper">
           
-              <section className="player-display">
+              <section className="player-display" onClick={this.handleChoice}>
                 <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />
                 <div className="now-playing__name">{this.state.left_side_track.name}</div>
                 <div className="now-playing__artist">{this.state.left_side_track.artists[0].name}</div>
               </section>
 
-              <section className="player-display">
+              <section className="player-display" onClick={this.handleChoice}>
                 <img src={this.state.right_side_track.album.images[0].url} className="now-playing__cover" alt="" />
                 <div className="now-playing__name">{this.state.right_side_track.name}</div>
                 <div className="now-playing__artist">{this.state.right_side_track.artists[0].name}</div>
@@ -120,15 +125,15 @@ class WebPlayback extends React.Component {
               <section className="player-buttons">
                 <button className="btn-spotify" onClick={this.handlePrevSong} >
                       Listen To Left Song
-                  </button>
+                </button>
 
-                  <button className="btn-spotify" onClick={() => { this.state.player.togglePlay() }} >
-                    { this.state.is_paused ? "PLAY" : "PAUSE" }
-                  </button>
+                <button className="btn-spotify" onClick={() => { this.state.player.togglePlay() }} >
+                  { this.state.is_paused ? "PLAY" : "PAUSE" }
+                </button>
 
-                  <button className="btn-spotify" onClick={this.handleNextSong} >
-                      Listen To Right Song
-                  </button>
+                <button className="btn-spotify" onClick={this.handleNextSong} >
+                    Listen To Right Song
+                </button>
               </section>
             </div>
         </main>

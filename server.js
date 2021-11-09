@@ -5,6 +5,7 @@ require('dotenv').config();
 const port = 5000;
 
 global.access_token = '';
+global.id = '';
 
 const spotify_client_id = process.env.spotifyClientId;
 const spotify_client_secret = process.env.spotifyClientSecret;
@@ -14,7 +15,7 @@ let app = express();
 
 app.get('/auth/login', (req, res) => {
   // transfer playback to this device requires 'user-modify-playback-state' score
-  const scope = 'streaming user-read-email user-read-private user-modify-playback-state';
+  const scope = 'streaming user-read-email user-read-private user-modify-playback-state playlist-modify-public';
 
   const searchParams = new URLSearchParams({
     response_type: 'code',
@@ -57,30 +58,66 @@ app.get('/auth/token', (req, res) => {
 });
 
 app.get('/auth/playback/', (req, res) => {
-  // https://api.spotify.com/v1/me/player
   // PUT request to transfer playback to our app.
   // request body: our device id
-  // oAuth required
   const deviceId = req.query.device_id;
   const options = {
     url: 'https://api.spotify.com/v1/me/player',
-    body: {
+    body: JSON.stringify({
       device_ids: [deviceId]
-    },
+    }),
     headers: {
       'Authorization': 'Bearer ' + access_token,
-      'Content-Type': 'application/json',
       'Accept': 'application/json'
-    },
-    json: true
+    }
   }
 
   request.put(options, function(error, response, body) {
-    if (!error) {
-      res.redirect('/');
-    }; 
+    console.log(response.statusCode);
+    if (!error && response.statusCode == 204) {
+      console.log('playback transfered');
+      res.end();
+    }
   });
 });
+
+app.get('/auth/user', (req, res) => {
+  const searchParams = new URLSearchParams({
+    access_token: access_token
+  });
+
+  user_id = request('https://api.spotify.com/v1/me?' + searchParams.toString(), (error, response, body) => {
+    // request current user's information, in order to create a new playlist for them.  
+    const data = JSON.parse(body);
+    const user_id = data.id;
+    const playlistOptions = {
+      url: `https://api.spotify.com/v1/users/${user_id}/playlists`,
+      headers: {
+        'Authorization': 'Bearer ' + access_token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: {
+        'name': 'Tinder Music',
+        'description': 'Playlist for tinder music'
+      },
+      json: true
+    };
+  
+    request.post(playlistOptions, function(error, response, body) {
+      if (!error) {
+        console.log('Creating Playlist!');
+        res.end();
+      }
+    });
+  });
+});
+
+/*
+app.get('/playlist/create', (req, res) => {
+  // POST request to create playlist for user.
+})
+*/
 
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
