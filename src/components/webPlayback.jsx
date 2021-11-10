@@ -108,11 +108,9 @@ class WebPlayback extends React.Component {
   }
 
   submitPlaylist() {
-    //create playlist
-    //fetch('/auth/user');
-
     //post data to proxy, so proxy can make post request to insert songs into playlist
-    function postData(url = '', data = {}) {
+    async function postData(url = '', data = {}) {
+      await fetch('/auth/user');
       return fetch(url, data);
     };
 
@@ -123,7 +121,7 @@ class WebPlayback extends React.Component {
       },
       body: JSON.stringify({
         'uris': this.state.final_playlist,
-        'position': '0'
+        'position': 0
       })
     });
   };

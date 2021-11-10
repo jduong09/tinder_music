@@ -6,12 +6,15 @@ const port = 5000;
 
 global.access_token = '';
 global.id = '';
+global.playlist_id = '';
 
 const spotify_client_id = process.env.spotifyClientId;
 const spotify_client_secret = process.env.spotifyClientSecret;
 const spotify_redirect_uri = process.env.spotifyRedirectUri;
 
 let app = express();
+
+app.use(express.json());
 
 app.get('/auth/login', (req, res) => {
   // transfer playback to this device requires 'user-modify-playback-state' score
@@ -76,7 +79,6 @@ app.get('/auth/playback/', (req, res) => {
   request.put(options, function(error, response, body) {
     console.log(response.statusCode);
     if (!error && response.statusCode == 204) {
-      console.log('playback transfered');
       res.end();
     }
   });
@@ -110,7 +112,8 @@ app.get('/auth/user', (req, res) => {
   
     request.post(playlistOptions, function(error, response, body) {
       if (!error) {
-        console.log('Creating Playlist!');
+        // create playlist id global variable
+        playlist_id = body.id;
         res.end();
       }
     });
@@ -118,10 +121,30 @@ app.get('/auth/user', (req, res) => {
 });
 
 app.post('/auth/playlist', (req, res) => {
-  console.log('receiving post request!')
-  
-  console.log(`Query here is: ${JSON.parse(req.query)}`);
+  // express server receives spotify uri, and position from front-end
+  const data = req.body;
+  // make a post request to spotify api, sending spotify uris (array) and position (string)
+  // to insert into playlist titled 'Tinder Music'
+  // POST /playlists/{playlist_id}/tracks
 
+  const newPlaylistOptions = {
+    url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
+    headers: {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      'uris': data.uris,
+      'position': data.position
+    })
+  };
+
+  request.post(newPlaylistOptions, function(error, response, body) {
+    if (!error) {
+      console.log(body);
+      res.end();
+    }
+  })
 });
 
 app.listen(port, () => {
