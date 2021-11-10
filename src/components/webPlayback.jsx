@@ -23,11 +23,15 @@ class WebPlayback extends React.Component {
       is_playing_left_track: true,
       left_side_track: track,
       right_side_track: track,
-      previous_track: false
+      previous_track: false,
+      // when sending final playlist to spotify api to create a playlist, spotify receives an array of spotify uris
+      final_playlist: []
     }
 
     this.handlePrevSong = this.handlePrevSong.bind(this);
     this.handleNextSong = this.handleNextSong.bind(this);
+    this.handleChoice = this.handleChoice.bind(this);
+    this.submitPlaylist = this.submitPlaylist.bind(this);
   }
 
   componentDidMount() {
@@ -51,8 +55,8 @@ class WebPlayback extends React.Component {
       this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
         async function transferPlayback() {
-          await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
-          return await fetch('/auth/user');
+          return await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
+          //await fetch('/auth/user');
         };
         transferPlayback();
       });
@@ -95,8 +99,34 @@ class WebPlayback extends React.Component {
     this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
   }
 
-  handleChoice() {
+  handleChoice(side) {
+    let updatedPlaylist = this.state.final_playlist;
+    side === 'left-side' ? updatedPlaylist.push(this.state.left_side_track.uri) : updatedPlaylist.push(this.state.right_side_track.uri);
+
+    this.setState({final_playlist: updatedPlaylist});
+    console.log(this.state.final_playlist);
   }
+
+  submitPlaylist() {
+    //create playlist
+    //fetch('/auth/user');
+
+    //post data to proxy, so proxy can make post request to insert songs into playlist
+    function postData(url = '', data = {}) {
+      return fetch(url, data);
+    };
+
+    postData('/auth/playlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        'uris': this.state.final_playlist,
+        'position': '0'
+      })
+    });
+  };
 
   render() {
     if (!this.state.is_active) {
@@ -110,13 +140,13 @@ class WebPlayback extends React.Component {
         <main className="container">
             <div className="main-wrapper">
           
-              <section className="player-display" onClick={this.handleChoice}>
+              <section className="player-display"  onClick={(e) => { this.handleChoice('left-side') }}>
                 <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />
                 <div className="now-playing__name">{this.state.left_side_track.name}</div>
                 <div className="now-playing__artist">{this.state.left_side_track.artists[0].name}</div>
               </section>
 
-              <section className="player-display" onClick={this.handleChoice}>
+              <section className="player-display" onClick={(e) =>  { this.handleChoice('right-side') }}>
                 <img src={this.state.right_side_track.album.images[0].url} className="now-playing__cover" alt="" />
                 <div className="now-playing__name">{this.state.right_side_track.name}</div>
                 <div className="now-playing__artist">{this.state.right_side_track.artists[0].name}</div>
@@ -129,6 +159,10 @@ class WebPlayback extends React.Component {
 
                 <button className="btn-spotify" onClick={() => { this.state.player.togglePlay() }} >
                   { this.state.is_paused ? "PLAY" : "PAUSE" }
+                </button>
+
+                <button className="btn-spotify" onClick={this.submitPlaylist} >
+                    FINISH
                 </button>
 
                 <button className="btn-spotify" onClick={this.handleNextSong} >

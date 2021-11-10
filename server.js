@@ -46,6 +46,7 @@ app.get('/auth/callback', (req, res) => {
 
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
+      // grab access token from request to spotify, change global variable access_token.
       access_token = body.access_token;
       res.redirect('/');
     };
@@ -81,6 +82,9 @@ app.get('/auth/playback/', (req, res) => {
   });
 });
 
+//express route to create playlist
+// get request to grab current user's information, specifically user_id
+// create playlist with spotify's user_id
 app.get('/auth/user', (req, res) => {
   const searchParams = new URLSearchParams({
     access_token: access_token
@@ -113,11 +117,12 @@ app.get('/auth/user', (req, res) => {
   });
 });
 
-/*
-app.get('/playlist/create', (req, res) => {
-  // POST request to create playlist for user.
-})
-*/
+app.post('/auth/playlist', (req, res) => {
+  console.log('receiving post request!')
+  
+  console.log(`Query here is: ${JSON.parse(req.query)}`);
+
+});
 
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
