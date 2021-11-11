@@ -1,24 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import './css/reset.css';
+import './css/App.css';
+import WebPlayback from './components/webPlayback.jsx';
+import LandingPage from './components/landingPage.js';
+import { useState, useEffect } from 'react';
 
 function App() {
+
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    async function getToken() {
+      const response = await fetch('/auth/token');
+      const json = await response.json();
+      setToken(json.access_token);
+    }
+
+    getToken();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          What to do, what to do.
-        </a>
+    <main className="App">
+      <header>
+        <nav>
+          <img src="spotifyIconRgbBlack.png" alt="spotify black logo"/>
+          <h1>Tinder Music</h1>
+          { (token === '') ? <ul></ul> : <ul><li>Hello Spotify is connected</li></ul> }
+        </nav>
       </header>
-    </div>
+      { (token === '') ? <LandingPage /> : <WebPlayback token={token} /> }
+    </main>
   );
 }
 

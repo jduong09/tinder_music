@@ -1,0 +1,43 @@
+html, body, header, nav, h1, a,
+ul, ol, li, strong, main, section, 
+button, i, div, img, h2, form, p,
+label, input, textarea, span, article,
+footer {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: inherit;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  text-decoration: inherit;
+  vertical-align: inherit;
+  box-sizing: inherit;
+  background: transparent;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+input[type="password"],
+input[type="email"],
+input[type="text"],
+input[type="submit"],
+textarea,
+button { 
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+button,
+input[type="submit"] {
+  cursor: pointer;
+}
