@@ -56,7 +56,6 @@ class WebPlayback extends React.Component {
         console.log('Ready with Device ID', device_id);
         async function transferPlayback() {
           return await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
-          //await fetch('/auth/user');
         };
         transferPlayback();
       });

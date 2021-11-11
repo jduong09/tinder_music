@@ -126,7 +126,6 @@ app.post('/auth/playlist', (req, res) => {
   // make a post request to spotify api, sending spotify uris (array) and position (string)
   // to insert into playlist titled 'Tinder Music'
   // POST /playlists/{playlist_id}/tracks
-
   const newPlaylistOptions = {
     url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
     headers: {
