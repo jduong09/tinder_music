@@ -146,6 +146,38 @@ app.post('/auth/playlist', (req, res) => {
   })
 });
 
+app.get('/auth/seed', (req, res) => {
+  // GET /recommendations
+  // Query:
+    // seed_artists (string)
+    // seed_genres (string)
+    // seed_tracks (string)
+    // limit (integer)
+
+  const queryParams = new URLSearchParams({
+    seed_genres: 'classical',
+    limit: 1
+  });
+
+  const seedOptions = {
+    url: ('https://api.spotify.com/v1/recommendations?' + queryParams.toString()),
+    headers: {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  };
+
+  request.get(seedOptions, function(error, response, body) {
+    if (!error) {
+      console.log(body);
+    } else {
+      console.log(error);
+    }
+    res.end();
+  })
+});
+
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });

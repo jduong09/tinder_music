@@ -32,6 +32,7 @@ class WebPlayback extends React.Component {
     this.handleNextSong = this.handleNextSong.bind(this);
     this.handleChoice = this.handleChoice.bind(this);
     this.submitPlaylist = this.submitPlaylist.bind(this);
+    this.giveMeInfo = this.giveMeInfo.bind(this);
   }
 
   componentDidMount() {
@@ -106,6 +107,10 @@ class WebPlayback extends React.Component {
     console.log(this.state.final_playlist);
   }
 
+  giveMeInfo() {
+    fetch('/auth/seed');
+  }
+
   submitPlaylist() {
     //post data to proxy, so proxy can make post request to insert songs into playlist
     async function postData(url = '', data = {}) {
@@ -164,6 +169,10 @@ class WebPlayback extends React.Component {
 
                 <button className="btn-spotify" onClick={this.handleNextSong} >
                     Listen To Right Song
+                </button>
+
+                <button className="btn-spotify" onClick={this.giveMeInfo} >
+                  Give me songs
                 </button>
               </section>
             </div>
