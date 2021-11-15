@@ -8,8 +8,6 @@ const LandingPage = () => (
   // Login takes user to web playback where they can play every song
   <section className="login">
     <a href="/auth/login">Login with Spotify Account</a>
-
-    <a href='/auth/seed'>Find Random songs!</a>
   </section>
 )
 
