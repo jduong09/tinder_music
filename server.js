@@ -77,7 +77,6 @@ app.get('/auth/playback/', (req, res) => {
   }
 
   request.put(options, function(error, response, body) {
-    console.log(response.statusCode);
     if (!error && response.statusCode == 204) {
       res.end();
     }
@@ -140,7 +139,6 @@ app.post('/auth/playlist', (req, res) => {
 
   request.post(newPlaylistOptions, function(error, response, body) {
     if (!error) {
-      console.log(body);
       res.end();
     }
   })
@@ -176,6 +174,32 @@ app.get('/auth/seed', (req, res) => {
     }
     res.end();
   })
+});
+
+// Get Request to /recommendations/available-genre-seeds
+app.get('/auth/genres', (req, res) => {
+
+  let genres = '';
+
+  const options = {
+    url: 'https://api.spotify.com/v1/recommendations/available-genre-seeds',
+    headers: {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  };
+
+  request.get(options, function(error, response, body) {
+    if (!error) {
+      const data = JSON.parse(body);
+      genres = data.genres;
+    } else {
+      console.log(error);
+    };
+    res.json({ genres: genres });
+    res.end();
+  });
 });
 
 app.listen(port, () => {
