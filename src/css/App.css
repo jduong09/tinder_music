@@ -121,27 +121,15 @@ h1 {
 }
 
 .yo {
-  animation-name: fadeIn;
-  animation-duration: 2s;
+  animation: fadeInOut 3s infinite;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInOut {
   from {
     opacity: 0;
   }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.hello {
-  animation-name: fadeOut;
-  animation-duration: 2s;
-}
-
-@keyframes fadeOut {
-  from {
+  
+  50% {
     opacity: 1;
   }
 
