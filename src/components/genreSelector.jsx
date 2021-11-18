@@ -4,37 +4,55 @@ import React, { useEffect, useState } from 'react';
 // There are around 126 genres.
 // What to do with this info.
 // Create 
-function GenreSelector() {
+class GenreSelector extends React.Component {
+  constructor(props) {
+    super(props);
 
-  const [genres, setGenres] = useState([]);
+    this.state = {
+      genres: []
+    };
+
+    this.changeButtonClass = this.changeButtonClass.bind(this);
+  }
   
-  useEffect(() => {
-    async function getGenres() {
-      const response = await fetch('/auth/genres');
-      const json = await response.json();
-      setGenres(json.genres);
-    }
-
-    getGenres();
-  }, []);
-  let randomNums = [];
-
-  for (let i = 0; i < 5; i++) {
-    const min = Math.floor(0);
-    const max = Math.ceil(genres.length);
-    const number = Math.floor(Math.random() * (max - min) + min);
-    randomNums.push(number);
-    console.log(randomNums)
+  async componentDidMount() {
+    const response = await fetch('/auth/genres');
+    const json = await response.json();
+    this.setState({ genres: json.genres });
   };
 
-  const genreList = randomNums.map((num, i) => {
-    return <li className="genre" key={i}><button>{genres[num]}</button></li>
-  });
+  getRandomNums() {
+    const { genres } = this.state;
+    console.log(genres);
+    let randomNums = [];
 
-  if (genres) {
-    return <ul className="genres">{genreList}</ul>;
-  } else {
-    return <div>Loading</div>;
+    for (let i = 0; i < 5; i++) {
+      const min = Math.floor(0);
+      const max = Math.ceil(genres.length);
+      const number = Math.floor(Math.random() * (max - min) + min);
+      randomNums.push(number);
+    };
+
+    return randomNums;
+  };
+
+  changeButtonClass(e) {
+    console.log(e.currentTarget);
+    const target = e.currentTarget;
+    target.classList.remove("yo");
+    target.classList.add("hello");
+  }
+
+  render() {
+    const genreList = this.getRandomNums().map((num, i) => {
+      return <li className="genre" key={i}><button className="yo" onAnimationEnd={this.changeButtonClass}>{this.state.genres[num]}</button></li>
+    });
+
+    if (this.state.genres) {
+      return <ul className="genres">{genreList}</ul>;
+    } else {
+      return <div>Loading</div>;
+    }
   }
 };
 

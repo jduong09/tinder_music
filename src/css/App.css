@@ -119,3 +119,33 @@ h1 {
   width: 100%;
   height: 100%;
 }
+
+.yo {
+  animation-name: fadeIn;
+  animation-duration: 2s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.hello {
+  animation-name: fadeOut;
+  animation-duration: 2s;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
