@@ -19,6 +19,12 @@ class Main extends React.Component {
     this.state = {
       genre: ''
     };
+
+    
+  }
+
+  handleGenreSelection(e) {
+    this.setState({ genre: e.currentTarget.innerHTML });
   }
 
   render() {
@@ -26,8 +32,8 @@ class Main extends React.Component {
 
     return (
       <div>
-        <GenreSelector />
-        {/* <WebPlayback token={token} /> */}
+        <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
+        {/* <WebPlayback token={token} genre={this.state.genre} /> */}
       </div>
     );
   }

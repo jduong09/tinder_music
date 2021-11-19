@@ -10,7 +10,8 @@ class GenreSelector extends React.Component {
 
     this.state = {
       genres: null,
-      genreList: []
+      genreList: [],
+      input: ''
     };
 
     this.changeButtonClass = this.changeButtonClass.bind(this);
@@ -72,10 +73,15 @@ class GenreSelector extends React.Component {
 
   render() {
     const genreList = this.state.genreList.map((genre, i) => {
-      return <li className="genre" key={i}><button className="yo" onAnimationIteration={this.updateGenreList}>{genre}</button></li>
+      return <li className="genre" key={i}><button className="yo" onClick={this.props.handleGenreSelection} onAnimationIteration={this.updateGenreList}>{genre}</button></li>
     })
+
     if (this.state.genres) {
-      return <ul className="genres">{genreList}</ul>;
+      return (
+        <div>
+          <ul className="genres">{genreList}</ul>
+        </div>
+      );
     } else {
       return <div>Loading</div>;
     }
