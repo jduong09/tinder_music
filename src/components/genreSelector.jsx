@@ -14,7 +14,6 @@ class GenreSelector extends React.Component {
       input: ''
     };
 
-    this.changeButtonClass = this.changeButtonClass.bind(this);
     this.updateGenreList = this.updateGenreList.bind(this);
   }
   
@@ -44,16 +43,9 @@ class GenreSelector extends React.Component {
     return randomNums;
   };
 
-  changeButtonClass(e) {
-    const target = e.currentTarget;
-    target.classList.remove("yo");
-    target.classList.add("hello");
-  };
-
   // needs to be called once, update the genre list after the fadeIn, fadeOut is complete.
   updateGenreList() {
     const randomNums = this.getRandomNums();
-
     const newGenreList = [];
 
     randomNums.forEach(num => {
@@ -61,25 +53,31 @@ class GenreSelector extends React.Component {
     });
 
     this.setState({ genreList: newGenreList });
-    // add 5 new random genre buttons to the dom.
-    // get random numbers
-    // iterate over the random numbers
-    // remove button at that index in the genre list. 
-    // create a new button, with the random num being the genre in the genres array.
-    // add to the genre list.
-
-    // give them the same properties so they can fadeIn, fadeOut. 
-  }
+  };
 
   render() {
     const genreList = this.state.genreList.map((genre, i) => {
-      return <li className="genre" key={i}><button className="yo" onClick={this.props.handleGenreSelection} onAnimationIteration={this.updateGenreList}>{genre}</button></li>
-    })
+      return <li className="genre" key={i}><button className="yo" onClick={(e) => this.setState({input: e.currentTarget.innerHTML})} onAnimationIteration={this.updateGenreList}>{genre}</button></li>
+    });
 
     if (this.state.genres) {
+      const selectList = this.state.genres.map((genre, i) => {
+        return <option value={genre} key={i}>{genre.toUpperCase()}</option>
+      });
+
       return (
-        <div>
+        <div className="select-list">
           <ul className="genres">{genreList}</ul>
+          <span>OR</span>
+          <select name='genres' id='genre-select' onChange={(e) => this.setState({input: e.target.value})}>
+            <option value=''>--Please Choose A Genre--</option>
+            {selectList}
+          </select>
+
+          <form onSubmit={this.props.handleGenreSelection}>
+            <input name="genre" value={this.state.input} readOnly={true}/>
+            <input type="submit" value="Select Genre" />            
+          </form>
         </div>
       );
     } else {

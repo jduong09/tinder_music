@@ -24,7 +24,9 @@ class Main extends React.Component {
   }
 
   handleGenreSelection(e) {
-    this.setState({ genre: e.currentTarget.innerHTML });
+    e.preventDefault();
+    console.log(e.target[0].value);
+    this.setState({genre: e.target[0].value});
   }
 
   render() {
@@ -33,6 +35,7 @@ class Main extends React.Component {
     return (
       <div>
         <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
+        <span>You selected {this.state.genre}</span>
         {/* <WebPlayback token={token} genre={this.state.genre} /> */}
       </div>
     );
