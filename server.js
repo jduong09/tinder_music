@@ -17,7 +17,7 @@ let app = express();
 app.use(express.json());
 
 app.get('/auth/login', (req, res) => {
-  // transfer playback to this device requires 'user-modify-playback-state' score
+  // transfer playback to this device requires 'user-modify-playback-state' scope
   const scope = 'streaming user-read-email user-read-private user-modify-playback-state playlist-modify-public';
 
   const searchParams = new URLSearchParams({
@@ -144,7 +144,9 @@ app.post('/auth/playlist', (req, res) => {
   })
 });
 
+// Get request to get recommendations according to genre given. 
 app.get('/auth/seed', (req, res) => {
+  const data = req.query;
   // GET /recommendations
   // Query:
     // seed_artists (string)
@@ -153,7 +155,7 @@ app.get('/auth/seed', (req, res) => {
     // limit (integer)
 
   const queryParams = new URLSearchParams({
-    seed_genres: 'classical',
+    seed_genres: data.genre,
     limit: 1
   });
 
@@ -168,7 +170,9 @@ app.get('/auth/seed', (req, res) => {
 
   request.get(seedOptions, function(error, response, body) {
     if (!error) {
-      console.log(body);
+      const data = JSON.parse(body);
+      const tracks = data.tracks;
+      console.log(tracks[0]);
     } else {
       console.log(error);
     }

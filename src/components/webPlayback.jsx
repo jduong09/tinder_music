@@ -14,6 +14,7 @@ const track = {
 
 class WebPlayback extends React.Component {
   constructor(props) {
+    // two props are this.props.token and this.props.genre
     super(props);
 
     this.state = {
@@ -108,7 +109,7 @@ class WebPlayback extends React.Component {
   }
 
   giveMeInfo() {
-    fetch('/auth/seed');
+    fetch('/auth/seed/?' + new URLSearchParams({ genre: this.props.genre }));
   }
 
   submitPlaylist() {
