@@ -35,7 +35,7 @@ class Main extends React.Component {
     return (
       <div>
         <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
-        {<WebPlayback token={token} genre={this.state.genre ? this.state.genre : ''} />}
+        {this.state.genre ? <WebPlayback token={token} genre={this.state.genre ? this.state.genre : ''} /> : ''}
       </div>
     );
   }

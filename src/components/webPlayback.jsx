@@ -37,6 +37,7 @@ class WebPlayback extends React.Component {
   }
 
   componentDidMount() {
+    fetch('/auth/seed/?' + new URLSearchParams({ genre: this.props.genre }));
 
     const script = document.createElement("script");
     script.src = 'https://sdk.scdn.co/spotify-player.js';
@@ -57,7 +58,8 @@ class WebPlayback extends React.Component {
       this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
         async function transferPlayback() {
-          return await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
+          await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
+          return await fetch('/auth/start/?' + new URLSearchParams({device_id : device_id}));
         };
         transferPlayback();
       });
@@ -75,6 +77,9 @@ class WebPlayback extends React.Component {
           paused,
           track_window: { current_track, next_tracks, previous_tracks }
         } = state;
+
+        console.log(current_track);
+        console.log(next_tracks);
 
         this.setState({
           left_side_track: this.state.is_playing_left_track ? current_track : previous_tracks[1],

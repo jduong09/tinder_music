@@ -7,6 +7,7 @@ const port = 5000;
 global.access_token = '';
 global.id = '';
 global.playlist_id = '';
+global.tracks = [];
 
 const spotify_client_id = process.env.spotifyClientId;
 const spotify_client_secret = process.env.spotifyClientSecret;
@@ -74,7 +75,7 @@ app.get('/auth/playback/', (req, res) => {
       'Authorization': 'Bearer ' + access_token,
       'Accept': 'application/json'
     }
-  }
+  };
 
   request.put(options, function(error, response, body) {
     if (!error && response.statusCode == 204) {
@@ -144,42 +145,6 @@ app.post('/auth/playlist', (req, res) => {
   })
 });
 
-// Get request to get recommendations according to genre given. 
-app.get('/auth/seed', (req, res) => {
-  const data = req.query;
-  // GET /recommendations
-  // Query:
-    // seed_artists (string)
-    // seed_genres (string)
-    // seed_tracks (string)
-    // limit (integer)
-
-  const queryParams = new URLSearchParams({
-    seed_genres: data.genre,
-    limit: 1
-  });
-
-  const seedOptions = {
-    url: ('https://api.spotify.com/v1/recommendations?' + queryParams.toString()),
-    headers: {
-      'Authorization': 'Bearer ' + access_token,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-  };
-
-  request.get(seedOptions, function(error, response, body) {
-    if (!error) {
-      const data = JSON.parse(body);
-      const tracks = data.tracks;
-      console.log(tracks[0]);
-    } else {
-      console.log(error);
-    }
-    res.end();
-  })
-});
-
 // Get Request to /recommendations/available-genre-seeds
 app.get('/auth/genres', (req, res) => {
 
@@ -204,6 +169,80 @@ app.get('/auth/genres', (req, res) => {
     res.json({ genres: genres });
     res.end();
   });
+});
+
+// Get request to get recommendations according to genre given. 
+app.get('/auth/seed', (req, res) => {
+  const data = req.query;
+  // GET /recommendations
+  // Query:
+    // seed_artists (string)
+    // seed_genres (string)
+    // seed_tracks (string)
+    // limit (integer)
+
+  const queryParams = new URLSearchParams({
+    seed_genres: data.genre,
+    limit: 2
+  });
+
+  const seedOptions = {
+    url: ('https://api.spotify.com/v1/recommendations?' + queryParams.toString()),
+    headers: {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  };
+
+  request.get(seedOptions, function(error, response, body) {
+    if (!error) {
+      const data = JSON.parse(body);
+      const tracks = data.tracks;
+      tracks.forEach(track => {
+        global.tracks.push(track.uri.trim());
+      });
+    } else {
+      console.log(error);
+    }
+    res.end();
+  })
+});
+
+// PUT request to me/player/play
+// Query: device_id (string)
+// Body: 
+  // context_uri (string)
+  // uris (array of strings)
+  // position_ms
+app.get('/auth/start', (req, res) => {
+  const device_id = req.query.device_id;
+
+  const queryParams = new URLSearchParams({
+    device_id: device_id
+  });
+  console.log(JSON.stringify(global.tracks));
+
+  const options = {
+    url: 'https://api.spotify.com/v1/me/player/play',
+    headers: {
+      'Authorization': 'Bearer ' + access_token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      'uris': global.tracks
+    })
+  };
+
+  request.put(options, function(error, response, body) {
+    if (!error) {
+      console.log(response.statusCode);
+    } else {
+      console.log(error);
+    };
+  });
+
+  res.end();
 });
 
 app.listen(port, () => {
