@@ -1,7 +1,7 @@
 import './css/reset.css';
 import './css/App.css';
 import WebPlayback from './components/webPlayback.jsx';
-import LandingPage from './components/landingPage.js';
+import LandingPage from './components/landingPage.jsx';
 import Main from './components/main.jsx';
 import { useState, useEffect } from 'react';
 
