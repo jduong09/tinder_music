@@ -51,7 +51,7 @@ app.get('/auth/callback', (req, res) => {
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       // grab access token from request to spotify, change global variable access_token.
-      access_token = body.access_token;
+      global.access_token = body.access_token;
       res.redirect('/');
     };
   });
@@ -59,7 +59,7 @@ app.get('/auth/callback', (req, res) => {
 
 // Get request to /auth/token on local server to set the global access_token to the response access_token
 app.get('/auth/token', (req, res) => {
-  res.json({ access_token: access_token });
+  res.json({ access_token: global.access_token });
 });
 
 app.get('/auth/playback/', (req, res) => {
@@ -72,13 +72,13 @@ app.get('/auth/playback/', (req, res) => {
       device_ids: [deviceId]
     }),
     headers: {
-      'Authorization': 'Bearer ' + access_token,
+      'Authorization': 'Bearer ' + global.access_token,
       'Accept': 'application/json'
     }
   };
 
   request.put(options, function(error, response, body) {
-    if (!error && response.statusCode == 204) {
+    if (!error && response.statusCode === 204) {
       res.end();
     }
   });
@@ -89,17 +89,17 @@ app.get('/auth/playback/', (req, res) => {
 // create playlist with spotify's user_id
 app.get('/auth/user', (req, res) => {
   const searchParams = new URLSearchParams({
-    access_token: access_token
+    access_token: global.access_token
   });
 
-  user_id = request('https://api.spotify.com/v1/me?' + searchParams.toString(), (error, response, body) => {
+  request('https://api.spotify.com/v1/me?' + searchParams.toString(), (error, response, body) => {
     // request current user's information, in order to create a new playlist for them.  
     const data = JSON.parse(body);
     const user_id = data.id;
     const playlistOptions = {
       url: `https://api.spotify.com/v1/users/${user_id}/playlists`,
       headers: {
-        'Authorization': 'Bearer ' + access_token,
+        'Authorization': 'Bearer ' + global.access_token,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
@@ -113,7 +113,7 @@ app.get('/auth/user', (req, res) => {
     request.post(playlistOptions, function(error, response, body) {
       if (!error) {
         // create playlist id global variable
-        playlist_id = body.id;
+        global.playlist_id = body.id;
         res.end();
       }
     });
@@ -127,9 +127,9 @@ app.post('/auth/playlist', (req, res) => {
   // to insert into playlist titled 'Tinder Music'
   // POST /playlists/{playlist_id}/tracks
   const newPlaylistOptions = {
-    url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
+    url: `https://api.spotify.com/v1/playlists/${global.playlist_id}/tracks`,
     headers: {
-      'Authorization': 'Bearer ' + access_token,
+      'Authorization': 'Bearer ' + global.access_token,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
@@ -153,7 +153,7 @@ app.get('/auth/genres', (req, res) => {
   const options = {
     url: 'https://api.spotify.com/v1/recommendations/available-genre-seeds',
     headers: {
-      'Authorization': 'Bearer ' + access_token,
+      'Authorization': 'Bearer ' + global.access_token,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
@@ -183,13 +183,13 @@ app.get('/auth/seed', (req, res) => {
 
   const queryParams = new URLSearchParams({
     seed_genres: data.genre,
-    limit: 2
+    limit: 10
   });
 
   const seedOptions = {
     url: ('https://api.spotify.com/v1/recommendations?' + queryParams.toString()),
     headers: {
-      'Authorization': 'Bearer ' + access_token,
+      'Authorization': 'Bearer ' + global.access_token,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
@@ -200,7 +200,8 @@ app.get('/auth/seed', (req, res) => {
       const data = JSON.parse(body);
       const tracks = data.tracks;
       tracks.forEach(track => {
-        global.tracks.push(track.uri.trim());
+        console.log(track.name);
+        global.tracks.push(track.uri);
       });
     } else {
       console.log(error);
@@ -218,15 +219,10 @@ app.get('/auth/seed', (req, res) => {
 app.get('/auth/start', (req, res) => {
   const device_id = req.query.device_id;
 
-  const queryParams = new URLSearchParams({
-    device_id: device_id
-  });
-  console.log(JSON.stringify(global.tracks));
-
   const options = {
-    url: 'https://api.spotify.com/v1/me/player/play',
+    url: `https://api.spotify.com/v1/me/player/play/?device_id=${device_id}`,
     headers: {
-      'Authorization': 'Bearer ' + access_token,
+      'Authorization': 'Bearer ' + global.access_token,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
