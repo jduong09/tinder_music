@@ -35,7 +35,9 @@ class WebPlayback extends React.Component {
       previous_track: false,
       // when sending final playlist to spotify api to create a playlist, spotify receives an array of spotify uris
       final_playlist: [],
-      made_move: false
+      made_move: false,
+      name: '',
+      pfp: '',
     }
 
     // handlePrevSong, handleNextSong are used for buttons in rendering and changing the current song that is played
@@ -168,7 +170,9 @@ class WebPlayback extends React.Component {
   submitPlaylist() {
     //post data to proxy, so proxy can make post request to insert songs into playlist
     async function postData(url = '', data = {}) {
-      await fetch('/auth/user');
+      // grabs user id, then creates a playlist called Tinder music.
+      await fetch('/api/playlist/create');
+      // makes a post request, adding songs to playlist of Tinder music.
       return fetch(url, data);
     };
 
@@ -194,42 +198,43 @@ class WebPlayback extends React.Component {
     } else {
       return (
         <main className="container">
-            <div className="main-wrapper">
-          
-              <section className="player-display"  onClick={(e) => { this.handleChoice('left-side') }}>
-                <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />
-                <div className="now-playing__name">{this.state.left_side_track.name}</div>
-                <div className="now-playing__artist">{this.state.left_side_track.artists[0].name}</div>
-              </section>
+          <div>{this.state.name}</div>
+          <img className="user-pfp" src={this.state.pfp} alt="user-pfp" />
+          <div className="main-wrapper">
+            <section className="player-display"  onClick={(e) => { this.handleChoice('left-side') }}>
+              <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />
+              <div className="now-playing__name">{this.state.left_side_track.name}</div>
+              <div className="now-playing__artist">{this.state.left_side_track.artists[0].name}</div>
+            </section>
 
-              <section className="player-display" onClick={(e) =>  { this.handleChoice('right-side') }}>
-                <img src={this.state.right_side_track.album.images[0].url} className="now-playing__cover" alt="" />
-                <div className="now-playing__name">{this.state.right_side_track.name}</div>
-                <div className="now-playing__artist">{this.state.right_side_track.artists[0].name}</div>
-              </section>
+            <section className="player-display" onClick={(e) =>  { this.handleChoice('right-side') }}>
+              <img src={this.state.right_side_track.album.images[0].url} className="now-playing__cover" alt="" />
+              <div className="now-playing__name">{this.state.right_side_track.name}</div>
+              <div className="now-playing__artist">{this.state.right_side_track.artists[0].name}</div>
+            </section>
 
-              <section className="player-buttons">
-                <button className="btn-spotify" onClick={this.handlePrevSong} >
-                      Listen To Left Song
-                </button>
+            <section className="player-buttons">
+              <button className="btn-spotify" onClick={this.handlePrevSong} >
+                    Listen To Left Song
+              </button>
 
-                <button className="btn-spotify" onClick={() => { this.state.player.togglePlay() }} >
-                  { this.state.is_paused ? "PLAY" : "PAUSE" }
-                </button>
+              <button className="btn-spotify" onClick={() => { this.state.player.togglePlay() }} >
+                { this.state.is_paused ? "PLAY" : "PAUSE" }
+              </button>
 
-                <button className="btn-spotify" onClick={this.submitPlaylist} >
-                    FINISH
-                </button>
+              <button className="btn-spotify" onClick={this.submitPlaylist} >
+                  FINISH
+              </button>
 
-                <button className="btn-spotify" onClick={this.handleNextSong} >
-                    Listen To Right Song
-                </button>
+              <button className="btn-spotify" onClick={this.handleNextSong} >
+                  Listen To Right Song
+              </button>
 
-                <button className="btn-spotify" onClick={this.giveMeInfo} >
-                  Give me songs
-                </button>
-              </section>
-            </div>
+              <button className="btn-spotify" onClick={this.giveMeInfo} >
+                Give me songs
+              </button>
+            </section>
+          </div>
         </main>
       );
     };
