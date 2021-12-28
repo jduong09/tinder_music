@@ -1,0 +1,30 @@
+.app-header {
+  width: 100%;
+  height: auto;
+  background-color: rgba(153, 3, 153, 0.644);
+  border-bottom: 1px solid black;
+  margin-bottom: 1.5em;
+}
+
+.app-header > nav {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+h1 {
+  color: black;
+}
+
+.user-information {
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.user-pfp {
+  width: 50px;
+  height: auto;
+  border: 1px solid rgba(153, 3, 153, 0.644);
+  border-radius: 25px;
+}

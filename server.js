@@ -8,15 +8,22 @@ global.access_token = '';
 global.id = '';
 global.playlist_id = '';
 global.tracks = [];
+global.user_id = '';
 
 const spotify_client_id = process.env.spotifyClientId;
 const spotify_client_secret = process.env.spotifyClientSecret;
 const spotify_redirect_uri = process.env.spotifyRedirectUri;
 
+/**
+ * Proxy Server listening on localhost:5000
+ * http://localhost:3000 sends request, it hits localhost:5000. 
+ */
+
 let app = express();
 
 app.use(express.json());
 
+// authorize app to make request to spotify's app. 
 app.get('/auth/login', (req, res) => {
   // transfer playback to this device requires 'user-modify-playback-state' scope
   const scope = 'streaming user-read-email user-read-private user-modify-playback-state playlist-modify-public';
@@ -28,9 +35,13 @@ app.get('/auth/login', (req, res) => {
     redirect_uri: spotify_redirect_uri
   });
 
+  // redirect browser to spotify's authorize page.
   res.redirect('https://accounts.spotify.com/authorize/?' + searchParams.toString());
 });
 
+// User authorizes app to grant access to scopes provided.
+// Spotify sends back a object, with a code.
+// Use code to allow access to spotify's api.
 app.get('/auth/callback', (req, res) => {
   const code = req.query.code;
 
@@ -48,6 +59,8 @@ app.get('/auth/callback', (req, res) => {
     json: true
   };
 
+  // Makes POST request to /token, grabs access_token from body and sets globally, to be used in future requests.
+  // THIS ISN"T SECURE HOW CAN WE SECURE IT.
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
       // grab access token from request to spotify, change global variable access_token.
@@ -84,9 +97,7 @@ app.get('/auth/playback/', (req, res) => {
   });
 });
 
-//express route to create playlist
-// get request to grab current user's information, specifically user_id
-// create playlist with spotify's user_id
+// Get request to grab current user's information, specifically user_id
 app.get('/auth/user', (req, res) => {
   const searchParams = new URLSearchParams({
     access_token: global.access_token
@@ -95,28 +106,34 @@ app.get('/auth/user', (req, res) => {
   request('https://api.spotify.com/v1/me?' + searchParams.toString(), (error, response, body) => {
     // request current user's information, in order to create a new playlist for them.  
     const data = JSON.parse(body);
-    const user_id = data.id;
-    const playlistOptions = {
-      url: `https://api.spotify.com/v1/users/${user_id}/playlists`,
-      headers: {
-        'Authorization': 'Bearer ' + global.access_token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: {
-        'name': 'Tinder Music',
-        'description': 'Playlist for tinder music'
-      },
-      json: true
-    };
-  
-    request.post(playlistOptions, function(error, response, body) {
-      if (!error) {
-        // create playlist id global variable
-        global.playlist_id = body.id;
-        res.end();
-      }
-    });
+    global.user_id = data.id;
+    res.send({ pfp: data.images[0].url, displayName: data.display_name });
+    res.end();
+  });
+});
+
+// Create playlist with spotify's user_id
+app.get('/api/playlist/create', (req, res) => {
+  const playlistOptions = {
+    url: `https://api.spotify.com/v1/users/${global.user_id}/playlists`,
+    headers: {
+      'Authorization': 'Bearer ' + global.access_token,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: {
+      'name': 'Tinder Music',
+      'description': 'Playlist for tinder music'
+    },
+    json: true
+  };
+
+  request.post(playlistOptions, function(error, response, body) {
+    if (!error) {
+      // create playlist id global variable
+      global.playlist_id = body.id;
+      res.end();
+    }
   });
 });
 
@@ -210,7 +227,7 @@ app.get('/auth/seed', (req, res) => {
   })
 });
 
-// PUT request to me/player/play
+// PUT request to me/player/play (Start/Pause User Playback)
 // Query: device_id (string)
 // Body: 
   // context_uri (string)
