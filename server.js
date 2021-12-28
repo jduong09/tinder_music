@@ -14,6 +14,11 @@ const spotify_client_id = process.env.spotifyClientId;
 const spotify_client_secret = process.env.spotifyClientSecret;
 const spotify_redirect_uri = process.env.spotifyRedirectUri;
 
+/**
+ * Proxy Server listening on localhost:5000
+ * http://localhost:3000 sends request, it hits localhost:5000. 
+ */
+
 let app = express();
 
 app.use(express.json());
@@ -30,11 +35,13 @@ app.get('/auth/login', (req, res) => {
     redirect_uri: spotify_redirect_uri
   });
 
+  // redirect browser to spotify's authorize page.
   res.redirect('https://accounts.spotify.com/authorize/?' + searchParams.toString());
 });
 
-// spotify sends back a object, with a code.
-// use code to allow access to spotify's api.
+// User authorizes app to grant access to scopes provided.
+// Spotify sends back a object, with a code.
+// Use code to allow access to spotify's api.
 app.get('/auth/callback', (req, res) => {
   const code = req.query.code;
 
@@ -52,7 +59,7 @@ app.get('/auth/callback', (req, res) => {
     json: true
   };
 
-  // makes POST request to /token, grabs access_token from body and sets globally, to be used in future requests.
+  // Makes POST request to /token, grabs access_token from body and sets globally, to be used in future requests.
   // THIS ISN"T SECURE HOW CAN WE SECURE IT.
   request.post(authOptions, function(error, response, body) {
     if (!error && response.statusCode === 200) {
@@ -90,9 +97,7 @@ app.get('/auth/playback/', (req, res) => {
   });
 });
 
-//express route to create playlist
-// get request to grab current user's information, specifically user_id
-// create playlist with spotify's user_id
+// Get request to grab current user's information, specifically user_id
 app.get('/auth/user', (req, res) => {
   const searchParams = new URLSearchParams({
     access_token: global.access_token
@@ -107,7 +112,7 @@ app.get('/auth/user', (req, res) => {
   });
 });
 
-// create playlist with spotify's user_id
+// Create playlist with spotify's user_id
 app.get('/api/playlist/create', (req, res) => {
   const playlistOptions = {
     url: `https://api.spotify.com/v1/users/${global.user_id}/playlists`,
@@ -222,7 +227,7 @@ app.get('/auth/seed', (req, res) => {
   })
 });
 
-// PUT request to me/player/play
+// PUT request to me/player/play (Start/Pause User Playback)
 // Query: device_id (string)
 // Body: 
   // context_uri (string)

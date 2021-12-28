@@ -1,11 +1,9 @@
+import { useState, useEffect } from 'react';
 import './css/reset.css';
 import './css/App.css';
-import WebPlayback from './components/webPlayback.jsx';
+import './css/main.css';
 import LandingPage from './components/landingPage.jsx';
 import Main from './components/main.jsx';
-import { useState, useEffect } from 'react';
-
-// Here is the homepage. ('/')
 
 /*
 * How will the app run
@@ -29,20 +27,13 @@ function App() {
       const response = await fetch('/auth/token');
       const json = await response.json();
       setToken(json.access_token);
-    }
+    };
 
     getToken();
-  }, []);
+  }, [token]);
 
   return (
     <main className="App">
-      <header>
-        <nav>
-          <img src="spotifyIconRgbBlack.png" alt="spotify black logo"/>
-          <h1>Tinder Music</h1>
-          { (token === '') ? <ul></ul> : <ul><li>Hello Spotify is connected</li></ul> }
-        </nav>
-      </header>
       { (token === '') ? <LandingPage /> : <Main token={token} /> }
     </main>
   );

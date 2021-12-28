@@ -36,8 +36,6 @@ class WebPlayback extends React.Component {
       // when sending final playlist to spotify api to create a playlist, spotify receives an array of spotify uris
       final_playlist: [],
       made_move: false,
-      name: '',
-      pfp: '',
     }
 
     // handlePrevSong, handleNextSong are used for buttons in rendering and changing the current song that is played
@@ -198,8 +196,6 @@ class WebPlayback extends React.Component {
     } else {
       return (
         <main className="container">
-          <div>{this.state.name}</div>
-          <img className="user-pfp" src={this.state.pfp} alt="user-pfp" />
           <div className="main-wrapper">
             <section className="player-display"  onClick={(e) => { this.handleChoice('left-side') }}>
               <img src={this.state.left_side_track.album.images[0].url} className="now-playing__cover" alt="" />

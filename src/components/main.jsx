@@ -1,6 +1,7 @@
 import React from 'react';
 import WebPlayback from './webPlayback';
 import GenreSelector from './genreSelector';
+import Nav from './nav';
 
 /*
   - User needs to select the Genre they are looking to listen to
@@ -22,36 +23,31 @@ class Main extends React.Component {
 
     this.state = {
       genre: '',
+      pfp: '', 
       name: '',
-      pfp: '',
-    };
-
-    
+    }; 
   }
 
   componentDidMount() {
-    fetch('/auth/user').then(data => data.json()).then(user => this.setState({ pfp: user.pfp, name: user.displayName }));
-  }
+    fetch('/auth/user').then(data => data.json()).then(user => this.setState({ pfp: user.pfp, name: user.displayName}));
+  };
 
   handleGenreSelection(e) {
     e.preventDefault();
-    console.log(e.target[0].value);
     this.setState({genre: e.target[0].value});
   }
 
   render() {
     const { token } = this.props;
+    const { pfp, name, genre } = this.state;
 
     return (
       <div>
-        <header>
-          <ul class="user-information">
-            <li>{this.state.name}</li>
-            <li><img className="user-pfp" src={this.state.pfp} alt="user-pfp"/></li>
-          </ul>
+        <header className="app-header">
+          <Nav pfp={pfp} name={name} />
         </header>
         <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
-        {this.state.genre ? <WebPlayback token={token} genre={this.state.genre ? this.state.genre : ''} /> : ''}
+        {genre ? <WebPlayback token={token} genre={genre} /> : ''}
       </div>
     );
   }
