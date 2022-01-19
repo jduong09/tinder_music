@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import './css/reset.css';
 import './css/App.css';
 import './css/main.css';
 import LandingPage from './components/landingPage.jsx';
-import Main from './components/main.jsx';
+// import Main from './components/main.jsx';
 
 /*
 * How will the app run
@@ -24,9 +25,11 @@ function App() {
 
   useEffect(() => {
     async function getToken() {
-      const response = await fetch('/auth/token');
-      const json = await response.json();
-      setToken(json.access_token);
+      const response = await axios('/auth/token');
+      console.log('RESPONSE: ', response);
+      const json = await response.data;
+      console.log(json);
+      await setToken(json);
     };
 
     getToken();
@@ -34,7 +37,8 @@ function App() {
 
   return (
     <main className="App">
-      { (token === '') ? <LandingPage /> : <Main token={token} /> }
+      {/* (token === '') ? <LandingPage /> : <Main token={token} /> */}
+      <LandingPage />
     </main>
   );
 }

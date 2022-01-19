@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import WebPlayback from './webPlayback';
 import GenreSelector from './genreSelector';
 import Nav from './nav';
@@ -29,7 +30,7 @@ class Main extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/auth/user').then(data => data.json()).then(user => this.setState({ pfp: user.pfp, name: user.displayName}));
+    axios('/auth/user').then(data => data.json()).then(user => this.setState({ pfp: user.pfp, name: user.displayName}));
   };
 
   handleGenreSelection(e) {
