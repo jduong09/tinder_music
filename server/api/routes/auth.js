@@ -1,4 +1,5 @@
 const express = require('express');
+const qs = require('querystring');
 /* 
 Uninstalled: request is deprecated
 const request = require('request');
@@ -12,7 +13,6 @@ const { spotifyClientId, spotifyClientSecret, spotifyRedirectUri  } = process.en
 // authorize app to make request to spotify's app. 
 router.get('/login', (req, res) => {
   // transfer playback to this device requires 'user-modify-playback-state' scope
-  console.log(req.session);
   const scope = 'streaming user-read-email user-read-private user-modify-playback-state playlist-modify-public';
 
   const searchParams = new URLSearchParams({
@@ -28,40 +28,40 @@ router.get('/login', (req, res) => {
 
 router.get('/callback', (req, res) => {
   const code = req.query.code;
-
-  const authOptions = {
+  const { session } = req;
+  axios({
+    method: 'POST', 
     url: 'https://accounts.spotify.com/api/token',
-    data: JSON.stringify({
+    headers: {
+      'Authorization': 'Basic ' + (Buffer.from(spotifyClientId + ':' + spotifyClientSecret).toString('base64')),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    data: qs.stringify({
       code,
       redirect_uri: spotifyRedirectUri,
       grant_type: 'authorization_code'
-    }),
-    headers: {
-      'Authorization': 'Basic ' + (Buffer.from(spotifyClientId + ':' + spotifyClientSecret).toString('base64')),
-      'Content-Type': 'application/json'
-    },
-     
-  };
-
-  axios.post(authOptions, function(error, response, body) {
-    conso
-    if (!error && response.statusCode === 200) {
-      const { session } = req;
-      session.tinderMusic.accessToken = body.access_token;
-      res.redirect('/');
-    };
+    })
+  })
+  .then((response) => {
+    const { data } = response;
+    session.accessToken = data.access_token;
+    res.redirect('/');
+    res.end();
+  })
+  .catch((error) => {
+    console.log(error);
+    res.redirect('/');
+    res.end();
   });
 });
 
 // Get request to /auth/token on local server to set the global access_token to the response access_token
 router.get('/token', (req, res) => {
-  console.log('SESSION: ', req.session);
-  const { tinderMusic } = req.session;
-  console.log(tinderMusic);
-  if (tinderMusic) {
-    res.status(200).json(tinderMusic.accessToken);
+  const { session } = req;
+  if (session.accessToken) {
+    return res.status(200).json(session.accessToken);
   }
-  res.redirect('/');
+  res.status(400).json('No token found');
   res.end();
 });
 
