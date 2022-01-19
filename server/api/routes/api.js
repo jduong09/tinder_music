@@ -1,7 +1,30 @@
 const express = require('express');
 const axios = require('axios');
+
 const router = express.Router();
 
+// Get Request to /recommendations/available-genre-seeds
+router.get('/genres', (req, res) => {
+  axios({
+    method: 'GET',
+    url: 'https://api.spotify.com/v1/recommendations/available-genre-seeds',
+    headers: {
+      'Authorization': `Bearer ${req.session.accessToken}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => {
+    const { data } = response;
+    res.status(200).json(data);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(400).json('Failed to fetch genres.');
+  });
+});
+
+/*
 router.get('/playback', (req, res) => {
   // PUT request to transfer playback to our app.
   // request body: our device id
@@ -23,9 +46,11 @@ router.get('/playback', (req, res) => {
     }
   });
 });
+*/
 
+/*
 // Create playlist with spotify's user_id
-router.get('/api/playlist/create', (req, res) => {
+router.get('/playlist/create', (req, res) => {
   const playlistOptions = {
     url: `https://api.spotify.com/v1/users/${global.user_id}/playlists`,
     headers: {
@@ -74,32 +99,10 @@ router.post('/playlist', (req, res) => {
   })
 });
 
-// Get Request to /recommendations/available-genre-seeds
-router.get('/genres', (req, res) => {
+*/
 
-  let genres = '';
 
-  const options = {
-    url: 'https://api.spotify.com/v1/recommendations/available-genre-seeds',
-    headers: {
-      'Authorization': 'Bearer ' + global.access_token,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-  };
-
-  axios.get(options, function(error, response, body) {
-    if (!error) {
-      const data = JSON.parse(body);
-      genres = data.genres;
-    } else {
-      console.log(error);
-    };
-    res.json({ genres: genres });
-    res.end();
-  });
-});
-
+/*
 // Get request to get recommendations according to genre given. 
 router.get('/seed', (req, res) => {
   const data = req.query;
@@ -169,5 +172,7 @@ router.get('/start', (req, res) => {
 
   res.end();
 });
+*/
 
 module.exports = router;
+

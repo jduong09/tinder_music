@@ -29,11 +29,13 @@ class Main extends React.Component {
     }; 
   }
 
-  /*
   componentDidMount() {
-    axios('/auth/user').then(data => data.json()).then(user => this.setState({ pfp: user.pfp, name: user.displayName}));
+    axios('/auth/user')
+    .then(response => {
+      const { data } = response;
+      this.setState({ pfp: data.pfp, name: data.displayName })
+    });
   };
-  */
 
   handleGenreSelection(e) {
     e.preventDefault();
@@ -43,7 +45,6 @@ class Main extends React.Component {
   render() {
     const { token } = this.props;
     const { pfp, name, genre } = this.state;
-
     /*
     return (
       <div>
@@ -56,7 +57,13 @@ class Main extends React.Component {
     );
     */
    return (
-   <div>{token}</div>
+    <div>
+      <header className="app-header">
+        <Nav pfp={pfp} name={name} />
+      </header>
+      <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
+      {genre ? <WebPlayback token={token} genre={genre} /> : ''}
+    </div>
    )
   }
 }

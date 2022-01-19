@@ -1,9 +1,5 @@
 const express = require('express');
 const qs = require('querystring');
-/* 
-Uninstalled: request is deprecated
-const request = require('request');
-*/
 const axios = require('axios');
 require('dotenv').config();
 const router = express.Router();
@@ -59,24 +55,31 @@ router.get('/callback', (req, res) => {
 router.get('/token', (req, res) => {
   const { session } = req;
   if (session.accessToken) {
-    return res.status(200).json(session.accessToken);
+    res.status(200).json(session.accessToken);
+    return res.end();
   }
   res.status(400).json('No token found');
   res.end();
 });
 
 router.get('/user', (req, res) => {
+  const { accessToken } = req.session;
   const searchParams = new URLSearchParams({
-    access_token: global.access_token
+    access_token: accessToken
   });
 
-  axios('https://api.spotify.com/v1/me?' + searchParams.toString(), (error, response, body) => {
-    // request current user's information, in order to create a new playlist for them.  
-    const data = JSON.parse(body);
-    global.user_id = data.id;
-    res.send({ pfp: data.images[0].url, displayName: data.display_name });
-    res.end();
-  });
+  axios({
+    method: 'GET',
+    url: 'https://api.spotify.com/v1/me?' + searchParams.toString()
+  }).then((response) => {
+      const { data } = response;
+      res.status(200).send({ displayName: data.display_name, pfp: data.images[0].url });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).send('Could not find user.');
+      res.end();
+    });
 });
 
 module.exports = router;
