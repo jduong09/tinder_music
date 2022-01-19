@@ -1,4 +1,5 @@
 import React from 'react';
+// import axios from 'axios';
 
 const track = {
   name: '',
@@ -14,7 +15,7 @@ const track = {
 
 class WebPlayback extends React.Component {
   constructor(props) {
-    // two props are this.props.token and this.props.genre
+    // two props are token and genre
     super(props);
 
     this.state = {
@@ -56,7 +57,8 @@ class WebPlayback extends React.Component {
       Create element script that will be our Web Playback SDK.
 
     */
-    fetch('/auth/seed/?' + new URLSearchParams({ genre: this.props.genre }));
+    // fetch('/auth/seed/?' + new URLSearchParams({ genre: this.props.genre }));
+    const { token } = this.props;
 
     const script = document.createElement("script");
     script.src = 'https://sdk.scdn.co/spotify-player.js';
@@ -66,7 +68,7 @@ class WebPlayback extends React.Component {
     window.onSpotifyWebPlaybackSDKReady = () => {
       const spotifyPlayer = new window.Spotify.Player({
         name: 'Web Playback SDK',
-        getOAuthToken: cb => cb(this.props.token),
+        getOAuthToken: cb => cb(token),
         volume: 0.3
       });
 
@@ -76,11 +78,13 @@ class WebPlayback extends React.Component {
       // run a post request to transfer the user's playback state to our device.
       this.state.player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
+        /*
         try {
           fetch('/auth/start/?' + new URLSearchParams({ device_id: device_id }));
         } catch(error) {
           console.log('ERROR: ', error);
         };
+        */
         /*
         async function transferPlayback() {
           await fetch('/auth/playback/?' + new URLSearchParams({ device_id: device_id }));
@@ -94,11 +98,12 @@ class WebPlayback extends React.Component {
         console.log('Device ID has gone offline', device_id);
       });
 
-      this.state.player.addListener('player_state_changed', ( state => {
+      this.state.player.addListener('player_state_changed', ((state) => {
         if (!state) {
           return;
         }
 
+        /*
         const {
           paused,
           track_window: { current_track, next_tracks, previous_tracks }
@@ -115,6 +120,7 @@ class WebPlayback extends React.Component {
         this.state.player.getCurrentState().then( state => {
           (!state) ? this.setState({ is_active: false }) : this.setState({ is_active: true });
         });
+        */
       }));
       this.state.player.connect();
     };
@@ -187,6 +193,8 @@ class WebPlayback extends React.Component {
   };
 
   render() {
+    return (<div>hello</div>);
+    /*
     if (!this.state.is_active) {
       return (
         <div>
@@ -234,6 +242,7 @@ class WebPlayback extends React.Component {
         </main>
       );
     };
+    */
   };
 };
 
