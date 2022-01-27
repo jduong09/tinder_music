@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 // import axios from 'axios';
 
 const track = {
@@ -48,7 +49,7 @@ class WebPlayback extends React.Component {
     this.submitPlaylist = this.submitPlaylist.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     /*
       When the component is mounted on the DOM,
       The component will have this.props.genre and this.props.token as its disposal.
@@ -57,7 +58,13 @@ class WebPlayback extends React.Component {
       Create element script that will be our Web Playback SDK.
 
     */
-    // fetch('/auth/seed/?' + new URLSearchParams({ genre: this.props.genre }));
+   
+    try {
+      await axios('api/seed/?' + new URLSearchParams({ genre: this.props.genre })).then(console.log('hey in seed'));
+    } catch(error) {
+      console.log('Error: ', error);
+    }
+
     const { token } = this.props;
 
     const script = document.createElement("script");
@@ -76,8 +83,15 @@ class WebPlayback extends React.Component {
       
       // When the device is online and ready
       // run a post request to transfer the user's playback state to our device.
-      this.state.player.addListener('ready', ({ device_id }) => {
+      this.state.player.addListener('ready', async ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
+
+        try {
+          await axios('/api/start/?' + new URLSearchParams({ device_id: device_id })).then(console.log('hey in start'));
+        } catch(error) {
+          console.log('Error: ', error);
+        }
+
         /*
         try {
           fetch('/auth/start/?' + new URLSearchParams({ device_id: device_id }));
