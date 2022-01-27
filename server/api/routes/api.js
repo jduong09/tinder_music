@@ -28,16 +28,10 @@ router.get('/genres', async (req, res) => {
 router.get('/seed', async (req, res) => {
   const { genre } = req.query;
   const { accessToken } = req.session;
-  // GET /recommendations
-  // Query:
-    // seed_artists (string)
-    // seed_genres (string)
-    // seed_tracks (string)
-    // limit (integer)
 
   const queryParams = new URLSearchParams({
     seed_genres: genre,
-    limit: 2
+    limit: 10
   });
 
   await axios({
@@ -51,8 +45,6 @@ router.get('/seed', async (req, res) => {
   })
     .then((response) => {
       const { data } = response;
-      // Send seed data to req.session. 
-      // Grab seed data in /start and use that to play seed data on browser.
       const tracksUri = data.tracks.map((track) => track.uri);
       req.session.tracks = tracksUri;
       res.status(200).json('Successfully seeded data.');
@@ -66,15 +58,9 @@ router.get('/seed', async (req, res) => {
 });
 
 // PUT request to me/player/play (Start/Pause User Playback)
-// Query: device_id (string)
-// Body: 
-  // context_uri (string)
-  // uris (array of strings)
-  // position_ms
 router.get('/start', async (req, res) => {
   const { device_id } = req.query;
   const { accessToken, tracks } = req.session;
-  console.log('Session in /start: ', req.session);
 
   await axios({
     method: 'PUT',
@@ -88,98 +74,100 @@ router.get('/start', async (req, res) => {
     })
   })
     .then(() => {
-      res.status(200).json('successfully started web playback sdk');
+      res.status(200).json('Successfully started Web Playback SDK');
       res.end();
     })
-    .catch(error => console.log(error));
-
-  /*
-  axios.put(options, function(error, response, body) {
-    if (!error) {
-      console.log(response.statusCode);
-    } else {
+    .catch((error) => {
       console.log(error);
-    };
-  });
-  */
-});
-
-/*
-router.get('/playback', (req, res) => {
-  // PUT request to transfer playback to our app.
-  // request body: our device id
-  const deviceId = req.query.device_id;
-  const options = {
-    url: 'https://api.spotify.com/v1/me/player',
-    body: JSON.stringify({
-      device_ids: [deviceId]
-    }),
-    headers: {
-      'Authorization': 'Bearer ' + global.access_token,
-      'Accept': 'application/json'
-    }
-  };
-
-  axios.put(options, function(error, response, body) {
-    if (!error && response.statusCode === 204) {
+      res.status(400).json('Error setting user\'s Playback SDK: ', error);
       res.end();
-    }
-  });
+    });
 });
-*/
 
-/*
-// Create playlist with spotify's user_id
-router.get('/playlist/create', (req, res) => {
-  const playlistOptions = {
-    url: `https://api.spotify.com/v1/users/${global.user_id}/playlists`,
+// PUT request to transfer playback to our app.
+router.get('/playback', async (req, res) => {
+  const { accessToken } = req.session;
+  const { device_id } = req.query;
+
+  await axios({
+    method: 'PUT',
+    url: 'https://api.spotify.com/v1/me/player',
     headers: {
-      'Authorization': 'Bearer ' + global.access_token,
+      'Authorization': 'Bearer ' + accessToken,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     },
-    body: {
-      'name': 'Tinder Music',
-      'description': 'Playlist for tinder music'
-    },
-    json: true
-  };
-
-  axios.post(playlistOptions, function(error, response, body) {
-    if (!error) {
-      // create playlist id global variable
-      global.playlist_id = body.id;
+    data: JSON.stringify({
+      device_ids: [device_id]
+    })
+  })
+    .then(() => {
+      res.status(200).json('Successfully transfered user\'s playback to app.');
       res.end();
-    }
-  });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json('Error transfering user\'s playback: ', error);
+      res.end();
+    });
 });
 
-router.post('/playlist', (req, res) => {
-  // express server receives spotify uri, and position from front-end
-  const data = req.body;
-  // make a post request to spotify api, sending spotify uris (array) and position (string)
-  // to insert into playlist titled 'Tinder Music'
-  // POST /playlists/{playlist_id}/tracks
-  const newPlaylistOptions = {
-    url: `https://api.spotify.com/v1/playlists/${global.playlist_id}/tracks`,
+// GET request to make POST request to create playlist with spotify's user_id
+router.get('/playlist/create', async (req, res) => {
+  const { accessToken, user } = req.session;
+  await axios({
+    method: 'POST',
+    url: `https://api.spotify.com/v1/users/${user.user_id}/playlists`,
     headers: {
-      'Authorization': 'Bearer ' + global.access_token,
+      'Authorization': 'Bearer ' + accessToken,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    data: JSON.stringify({
+      name: 'Tinder Music',
+      description: 'Playlist from tinder music game.'
+    })
+  })
+    .then((response) => {
+      const { data } = response;
+      req.session.playlist = { playlist_id: data.id };
+      res.status(200).json('Successfully created a playlist.');
+      res.end();
+    })
+    .catch((error) => {
+      console.log('Error: ', error);
+      res.status(400).json('Error creating a playlist.');
+      res.end();
+    });
+});
+
+// PUT request that sends a POST request to add app's tracks to 'Tinder Music' playlist
+router.put('/playlist/submit', async (req, res) => {
+  const { accessToken, playlist } = req.session;
+  const { uris, position } = req.body;
+
+  await axios({
+    method: 'POST',
+    url: `https://api.spotify.com/v1/playlists/${playlist.playlist_id}/tracks`,
+    headers: {
+      'Authorization': 'Bearer ' + accessToken,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      'uris': data.uris,
-      'position': data.position
+    data: JSON.stringify({
+      uris,
+      position
     })
-  };
-
-  axios.post(newPlaylistOptions, function(error, response, body) {
-    if (!error) {
-      res.end();
-    }
   })
+    .then(() => {
+      res.status(200).json('Successfully added songs to Tinder Music playlist.');
+      res.end(); 
+    })
+    .catch((error) => {
+      console.log('Error: ', error);
+      res.status(400).json('Error adding songs to Tinder Music playlist.');
+      res.end();
+    });
 });
-
-*/
 
 module.exports = router;
 

@@ -29,8 +29,8 @@ class Main extends React.Component {
     }; 
   }
 
-  componentDidMount() {
-    axios('/auth/user')
+  async componentDidMount() {
+    await axios('/auth/user')
     .then(response => {
       const { data } = response;
       this.setState({ pfp: data.pfp, name: data.displayName })

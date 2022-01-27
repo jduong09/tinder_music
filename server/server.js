@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieSession = require('cookie-session');
+const bodyParser = require('body-parser')
 require('dotenv').config();
 const apiRouter = require('./api');
 
@@ -13,6 +14,8 @@ const port = 5000;
  */
 
 const app = express();
+
+app.use(bodyParser.json());
 
 app.use(cookieSession({
     name: 'tinderMusic',

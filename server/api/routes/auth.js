@@ -18,14 +18,13 @@ router.get('/login', (req, res) => {
     redirect_uri: spotifyRedirectUri
   });
 
-  // redirect browser to spotify's authorize page.
   res.redirect('https://accounts.spotify.com/authorize/?' + searchParams.toString());
 });
 
-router.get('/callback', (req, res) => {
+router.get('/callback', async (req, res) => {
   const code = req.query.code;
   const { session } = req;
-  axios({
+  await axios({
     method: 'POST', 
     url: 'https://accounts.spotify.com/api/token',
     headers: {
@@ -52,27 +51,25 @@ router.get('/callback', (req, res) => {
 });
 
 // Get request to /auth/token on local server to set the global access_token to the response access_token
-router.get('/token', (req, res) => {
+router.get('/token', async (req, res) => {
   const { session } = req;
   if (session.accessToken) {
-    res.status(200).json(session.accessToken);
+    await res.status(200).json(session.accessToken);
     return res.end();
   }
-  res.status(400).json('No token found');
+  await res.status(400).json('No token found');
   res.end();
 });
 
-router.get('/user', (req, res) => {
+router.get('/user', async (req, res) => {
   const { accessToken } = req.session;
-  const searchParams = new URLSearchParams({
-    access_token: accessToken
-  });
-
-  axios({
+  
+  await axios({
     method: 'GET',
-    url: 'https://api.spotify.com/v1/me?' + searchParams.toString()
+    url: 'https://api.spotify.com/v1/me?' + new URLSearchParams({ access_token: accessToken })
   }).then((response) => {
       const { data } = response;
+      req.session.user = { user_id: data.id };
       res.status(200).send({ displayName: data.display_name, pfp: data.images[0].url });
     })
     .catch((error) => {
