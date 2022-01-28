@@ -62,7 +62,6 @@ class WebPlayback extends React.Component {
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      const { player } = this.state;
       const spotifyPlayer = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: cb => cb(token),
@@ -70,6 +69,7 @@ class WebPlayback extends React.Component {
       });
 
       this.setState({ player: spotifyPlayer });
+      const { player } = this.state;
       
       player.addListener('ready', async ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
