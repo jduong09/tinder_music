@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import './css/reset.css';
 import './css/App.css';
 import './css/main.css';
@@ -23,10 +24,13 @@ function App() {
   const [token, setToken] = useState('');
 
   useEffect(() => {
-    async function getToken() {
-      const response = await fetch('/auth/token');
-      const json = await response.json();
-      setToken(json.access_token);
+    const getToken = async () => {
+      const response = await axios('/auth/token');
+      if (response.status === 400) {
+        return;
+      }
+
+      setToken(response.data);
     };
 
     getToken();
@@ -34,7 +38,7 @@ function App() {
 
   return (
     <main className="App">
-      { (token === '') ? <LandingPage /> : <Main token={token} /> }
+      {(token === '') ? <LandingPage /> : <Main token={token} />}
     </main>
   );
 }

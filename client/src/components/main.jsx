@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import WebPlayback from './webPlayback';
 import GenreSelector from './genreSelector';
 import Nav from './nav';
@@ -28,8 +29,12 @@ class Main extends React.Component {
     }; 
   }
 
-  componentDidMount() {
-    fetch('/auth/user').then(data => data.json()).then(user => this.setState({ pfp: user.pfp, name: user.displayName}));
+  async componentDidMount() {
+    await axios('/auth/user')
+    .then(response => {
+      const { data } = response;
+      this.setState({ pfp: data.pfp, name: data.displayName })
+    });
   };
 
   handleGenreSelection(e) {
@@ -40,7 +45,6 @@ class Main extends React.Component {
   render() {
     const { token } = this.props;
     const { pfp, name, genre } = this.state;
-
     return (
       <div>
         <header className="app-header">

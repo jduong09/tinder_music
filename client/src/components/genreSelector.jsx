@@ -1,15 +1,12 @@
 import React from 'react';
+import axios from 'axios';
 
-// Get available genre seeds from API for GenreSelector (done)
-// There are around 126 genres.
-// What to do with this info.
-// Create 
 class GenreSelector extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      genres: null,
+      genres: '',
       genreList: [],
       input: ''
     };
@@ -18,16 +15,18 @@ class GenreSelector extends React.Component {
   }
   
   async componentDidMount() {
-    const response = await fetch('/auth/genres');
-    const json = await response.json();
+    try {
+      const response = await axios('/api/genres').then((response) => response.data);
+      const genreList = [];
+      const { genres } = response;
+      this.getRandomNums(genres).forEach(num => {
+        genreList.push(genres[num]);
+      });
 
-    const genreList = [];
-
-    this.getRandomNums(json.genres).forEach(num => {
-      genreList.push(json.genres[num]);
-    });
-
-    this.setState({ genres: json.genres, genreList: genreList });
+      this.setState({ genres, genreList });
+    } catch(error) {
+      console.log(error);
+    }
   };
 
   getRandomNums(genres = this.state.genres) {
