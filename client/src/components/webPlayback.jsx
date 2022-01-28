@@ -62,6 +62,7 @@ class WebPlayback extends React.Component {
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
+      const { player } = this.state;
       const spotifyPlayer = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: cb => cb(token),
@@ -70,7 +71,7 @@ class WebPlayback extends React.Component {
 
       this.setState({ player: spotifyPlayer });
       
-      this.state.player.addListener('ready', async ({ device_id }) => {
+      player.addListener('ready', async ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
 
         try {
@@ -81,11 +82,11 @@ class WebPlayback extends React.Component {
         }
       });
 
-      this.state.player.addListener('not_ready', ({ device_id }) => {
+      player.addListener('not_ready', ({ device_id }) => {
         console.log('Device ID has gone offline', device_id);
       });
 
-      this.state.player.addListener('player_state_changed', ((state) => {
+      player.addListener('player_state_changed', ((state) => {
         if (!state) {
           return;
         }
@@ -95,53 +96,59 @@ class WebPlayback extends React.Component {
           track_window: { current_track, next_tracks, previous_tracks }
         } = state;
 
+        const { is_playing_left_track } = this.state;
+
         previous_tracks.push(current_track);
 
         this.setState({
-          left_side_track: this.state.is_playing_left_track ? current_track : previous_tracks[0],
-          right_side_track: this.state.is_playing_left_track ? next_tracks[0] : current_track,
+          left_side_track: is_playing_left_track ? current_track : previous_tracks[0],
+          right_side_track: is_playing_left_track ? next_tracks[0] : current_track,
           is_paused: paused
         });
         
-        this.state.player.getCurrentState().then( state => {
+        player.getCurrentState().then((state) => {
           (!state) ? this.setState({ is_active: false }) : this.setState({ is_active: true });
         });
       }));
-      this.state.player.connect();
+      player.connect();
     };
   };
 
   handlePrevSong() {
-    if (this.state.is_playing_left_track) {
-      this.state.player.seek(0).then(() => {
+    const { is_playing_left_track, player } = this.state;
+    if (is_playing_left_track) {
+      player.seek(0).then(() => {
         console.log('Replaying Song!');
       });
     } else {
-      this.state.player.previousTrack();
-      this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
+      player.previousTrack();
+      this.setState({ is_playing_left_track: !is_playing_left_track });
     }
   }
 
   handleNextSong() {
-    if (this.state.is_playing_left_track) {
-      this.state.player.nextTrack();
-      this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
-    } else if (!this.state.made_move) {
+    const { is_playing_left_track, player, made_move } = this.state;
+    if (is_playing_left_track) {
+      player.nextTrack();
+      this.setState({ is_playing_left_track: !is_playing_left_track });
+    } else if (!made_move) {
       alert('You must choose a song!');
     } else {
-      this.state.player.nextTrack();
-      this.setState({ is_playing_left_track: !this.state.is_playing_left_track });
+      player.nextTrack();
+      this.setState({ is_playing_left_track: !is_playing_left_track });
     }
   }
 
   handleChoice(side) {
-    let updatedPlaylist = this.state.final_playlist;
-    side === 'left-side' ? updatedPlaylist.push(this.state.left_side_track.uri) : updatedPlaylist.push(this.state.right_side_track.uri);
+    const { final_playlist, left_side_track, right_side_track } = this.state;
+    let updatedPlaylist = final_playlist;
+    side === 'left-side' ? updatedPlaylist.push(left_side_track.uri) : updatedPlaylist.push(right_side_track.uri);
 
     this.setState({final_playlist: updatedPlaylist, made_move: true});
   }
 
   async submitPlaylist() {
+    const { final_playlist } = this.state;
     try {
       await axios('/api/playlist/create');
       await axios({
@@ -151,7 +158,7 @@ class WebPlayback extends React.Component {
           'Content-Type': 'application/json'
         },
         data: JSON.stringify({
-          uris: this.state.final_playlist,
+          uris: final_playlist,
           position: 0
         })
       });

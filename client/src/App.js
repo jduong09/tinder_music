@@ -24,13 +24,13 @@ function App() {
   const [token, setToken] = useState('');
 
   useEffect(() => {
-    async function getToken() {
+    const getToken = async () => {
       const response = await axios('/auth/token');
       if (response.status === 400) {
         return;
       }
-      const accessToken = response.data;
-      setToken(accessToken);
+
+      setToken(response.data);
     };
 
     getToken();

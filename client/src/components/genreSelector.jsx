@@ -18,11 +18,12 @@ class GenreSelector extends React.Component {
     try {
       const response = await axios('/api/genres').then((response) => response.data);
       const genreList = [];
-      this.getRandomNums(response.genres).forEach(num => {
-        genreList.push(response.genres[num]);
+      const { genres } = response;
+      this.getRandomNums(genres).forEach(num => {
+        genreList.push(genres[num]);
       });
 
-      this.setState({ genres: response.genres, genreList: genreList });
+      this.setState({ genres, genreList });
     } catch(error) {
       console.log(error);
     }
