@@ -53,7 +53,7 @@ class Main extends React.Component {
         <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
         {genre ? <WebPlayback token={token} genre={genre} /> : ''}
       </div>
-    )
+    );
   }
 }
 
