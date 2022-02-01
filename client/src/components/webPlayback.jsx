@@ -206,24 +206,24 @@ class WebPlayback extends React.Component {
             </section>
 
             <section className="player-buttons">
-              <button className="btn-spotify" onClick={this.handlePrevSong} >
+              <button type="button" className="btn-spotify" onClick={this.handlePrevSong} >
                     Listen To Left Song
               </button>
 
-              <button className="btn-spotify" onClick={() => player.togglePlay()} >
+              <button type="button" className="btn-spotify" onClick={() => player.togglePlay()} >
                 { is_paused ? "PLAY" : "PAUSE" }
               </button>
 
-              <button className="btn-spotify" onClick={this.submitPlaylist} >
+              <button type="button" className="btn-spotify" onClick={this.submitPlaylist} >
                   FINISH
               </button>
 
-              <button className="btn-spotify" onClick={this.handleNextSong} >
+              <button type="button" className="btn-spotify" onClick={this.handleNextSong} >
                   Listen To Right Song
               </button>
             </section>
           </div>
-          <button type="button" onClick={this.handleLogout}>Log Out</button>
+          <button type="button" className="btn-spotify" onClick={this.handleLogout}>Log Out</button>
         </main>
       );
     };
