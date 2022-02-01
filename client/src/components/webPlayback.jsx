@@ -45,6 +45,7 @@ class WebPlayback extends React.Component {
     this.handleChoice = this.handleChoice.bind(this);
     // submitPlaylist is used at the end of the app, to create a playlist and save to user's spotify account
     this.submitPlaylist = this.submitPlaylist.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
   async componentDidMount() {
@@ -165,7 +166,17 @@ class WebPlayback extends React.Component {
     } catch(error) {
       console.log('Error: ', error);
     }
-  };
+  }
+
+  async handleLogout() {
+    const { player } = this.state;
+    player.disconnect();
+    try {
+      await axios('/auth/logout');
+    } catch(error) {
+      console.log('Error: ', error);
+    }
+  }
 
   render() {
     const { is_active, left_side_track, right_side_track, player, is_paused } = this.state;
@@ -209,6 +220,7 @@ class WebPlayback extends React.Component {
               </button>
             </section>
           </div>
+          <button type="button" onClick={this.handleLogout}>Log Out</button>
         </main>
       );
     };
