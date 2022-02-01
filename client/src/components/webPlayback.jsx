@@ -169,6 +169,7 @@ class WebPlayback extends React.Component {
   }
 
   async handleLogout() {
+    const { setToken } = this.props;
     const { player } = this.state;
     player.disconnect();
     try {
@@ -176,6 +177,8 @@ class WebPlayback extends React.Component {
     } catch(error) {
       console.log('Error: ', error);
     }
+
+    setToken('');
   }
 
   render() {

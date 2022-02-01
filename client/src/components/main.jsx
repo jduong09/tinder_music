@@ -29,7 +29,7 @@ class Main extends React.Component {
   }
 
   render() {
-    const { token } = this.props;
+    const { token, setToken } = this.props;
     const { pfp, name, genre } = this.state;
     return (
       <div>
@@ -37,7 +37,7 @@ class Main extends React.Component {
           <Nav pfp={pfp} name={name} />
         </header>
         <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
-        {genre ? <WebPlayback token={token} genre={genre} /> : ''}
+        {genre ? <WebPlayback token={token} genre={genre} setToken={setToken} /> : ''}
       </div>
     );
   }
