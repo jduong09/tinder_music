@@ -6,20 +6,7 @@ import './css/main.css';
 import LandingPage from './components/landingPage.jsx';
 import Main from './components/main.jsx';
 
-/*
-* How will the app run
-* - Landing Page
-*   - Prompt User to login to their spotify account, giving the app rights to alter their playback, to create a playlist and insert songs into that playlist. 
-*   - Uses spotify recommendations api to get songs in order to play.
-* - After authorization
-*   - Moved to main component
-*   - Give genre choices for user to select from.
-* - After Genre choice
-*   - transfer playback
-      - play songs and after 5 rounds, create playlist for user
-      - Give final playlist. 
-*/ 
-function App() {
+const App = () => {
 
   const [token, setToken] = useState('');
 
@@ -38,7 +25,7 @@ function App() {
 
   return (
     <main className="App">
-      {(token === '') ? <LandingPage /> : <Main token={token} />}
+      {(token === '') ? <LandingPage /> : <Main token={token} setToken={setToken} />}
     </main>
   );
 }

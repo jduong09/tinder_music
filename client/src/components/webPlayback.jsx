@@ -45,6 +45,7 @@ class WebPlayback extends React.Component {
     this.handleChoice = this.handleChoice.bind(this);
     // submitPlaylist is used at the end of the app, to create a playlist and save to user's spotify account
     this.submitPlaylist = this.submitPlaylist.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
   async componentDidMount() {
@@ -165,7 +166,20 @@ class WebPlayback extends React.Component {
     } catch(error) {
       console.log('Error: ', error);
     }
-  };
+  }
+
+  async handleLogout() {
+    const { setToken } = this.props;
+    const { player } = this.state;
+    player.disconnect();
+    try {
+      await axios('/auth/logout');
+    } catch(error) {
+      console.log('Error: ', error);
+    }
+
+    setToken('');
+  }
 
   render() {
     const { is_active, left_side_track, right_side_track, player, is_paused } = this.state;
@@ -192,23 +206,24 @@ class WebPlayback extends React.Component {
             </section>
 
             <section className="player-buttons">
-              <button className="btn-spotify" onClick={this.handlePrevSong} >
+              <button type="button" className="btn-spotify" onClick={this.handlePrevSong} >
                     Listen To Left Song
               </button>
 
-              <button className="btn-spotify" onClick={() => player.togglePlay()} >
+              <button type="button" className="btn-spotify" onClick={() => player.togglePlay()} >
                 { is_paused ? "PLAY" : "PAUSE" }
               </button>
 
-              <button className="btn-spotify" onClick={this.submitPlaylist} >
+              <button type="button" className="btn-spotify" onClick={this.submitPlaylist} >
                   FINISH
               </button>
 
-              <button className="btn-spotify" onClick={this.handleNextSong} >
+              <button type="button" className="btn-spotify" onClick={this.handleNextSong} >
                   Listen To Right Song
               </button>
             </section>
           </div>
+          <button type="button" className="btn-spotify" onClick={this.handleLogout}>Log Out</button>
         </main>
       );
     };

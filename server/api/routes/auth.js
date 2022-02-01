@@ -15,7 +15,8 @@ router.get('/login', (req, res) => {
     response_type: 'code',
     client_id: spotifyClientId,
     scope: scope,
-    redirect_uri: spotifyRedirectUri
+    redirect_uri: spotifyRedirectUri,
+    show_dialog: true
   });
 
   res.redirect('https://accounts.spotify.com/authorize/?' + searchParams.toString());
@@ -77,6 +78,13 @@ router.get('/user', async (req, res) => {
       res.status(400).send('Could not find user.');
       res.end();
     });
+});
+
+router.get('/logout', async (req, res) => {
+  req.session = null;
+  res.clearCookie('tinderMusic');
+  res.redirect('/');
+  res.end();
 });
 
 module.exports = router;
