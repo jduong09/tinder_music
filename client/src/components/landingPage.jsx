@@ -19,7 +19,7 @@ const LandingPage = () => (
         <li>Choose the left song or the right song!</li>
         <li>Save YOUR songs to a playlist to listen later!</li>
       </ul>
-      <a className="login-button" href="/login">Get Started!</a>
+      <a className="login-button" href="/auth/login">Get Started!</a>
     </section>
   </section>
 )

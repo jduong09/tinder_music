@@ -18,6 +18,7 @@
 
 .landing-page-about li {
   padding-top: 1em;
+  padding-bottom: 1em;
 }
 
 .login-button {
@@ -28,6 +29,11 @@
   font-size: 18px;
   padding: 10px;
   text-decoration: none;
+}
+
+.landing-page-about > .login-button {
+  border-color: white;
+  background-color: white;
 }
 
 .login-button:hover {
