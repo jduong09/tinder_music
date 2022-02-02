@@ -2,12 +2,6 @@ import React from 'react';
 import Nav from './nav';
 
 const LandingPage = () => (
-  /** How do I want the landing page to look.
-   * Displays App Title, Spotify logo.
-   * Displays Login Button/Get Started Button.
-  /*
-  
-  */
   <section className="landing-page">
     <header className="app-header">
       <Nav />
