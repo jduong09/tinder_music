@@ -1,8 +1,7 @@
 .app-header {
   width: 100%;
   height: auto;
-  background-color: rgba(153, 3, 153, 0.644);
-  border-bottom: 1px solid black;
+  background-color: rgba(32, 30, 30, 1);
   margin-bottom: 1.5em;
 }
 
@@ -10,10 +9,6 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-}
-
-h1 {
-  color: black;
 }
 
 .user-information {

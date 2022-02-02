@@ -1,0 +1,43 @@
+.landing-page {
+  height: 100vh;
+  background-image: url('../kaboompics-com-6251.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.landing-page-about {
+  width: 25%;
+  height: auto;
+  color: white;
+  border: 1px solid rgba(153, 3, 153, 0.644);
+  background-color: rgba(153, 3, 153, 0.644);
+  padding: 1em;
+  margin-left: 1em;
+  border-radius: 10px;
+}
+
+.landing-page-about li {
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+
+.login-button {
+  border: 1px solid rgba(153, 3, 153, 0.644);
+  border-radius: 5px;
+  color: black;
+  background-color: rgba(153, 3, 153, 0.644);
+  font-size: 18px;
+  padding: 10px;
+  text-decoration: none;
+}
+
+.landing-page-about > .login-button {
+  border-color: white;
+  background-color: white;
+}
+
+.login-button:hover {
+  border-color: rgb(94, 2, 94);
+  background-color: rgb(94, 2, 94);
+  color: white;
+}
