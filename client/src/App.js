@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import './css/reset.css';
-import './css/App.css';
-import './css/main.css';
-import './css/landingPage.css';
+import './css';
 import LandingPage from './components/landingPage.jsx';
 import Main from './components/main.jsx';
 
