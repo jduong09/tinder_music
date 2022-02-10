@@ -31,7 +31,7 @@ router.get('/seed', async (req, res) => {
 
   const queryParams = new URLSearchParams({
     seed_genres: genre,
-    limit: 10
+    limit: 12
   });
 
   await axios({
@@ -74,7 +74,7 @@ router.get('/start', async (req, res) => {
     })
   })
     .then(() => {
-      res.status(200).json('Successfully started Web Playback SDK');
+      res.status(200).json({ tracks });
       res.end();
     })
     .catch((error) => {
@@ -151,7 +151,8 @@ router.put('/playlist/submit', async (req, res) => {
     url: `https://api.spotify.com/v1/playlists/${playlist.playlist_id}/tracks`,
     headers: {
       'Authorization': 'Bearer ' + accessToken,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
     },
     data: JSON.stringify({
       uris,

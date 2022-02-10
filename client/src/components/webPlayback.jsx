@@ -18,32 +18,21 @@ class WebPlayback extends React.Component {
     super(props);
 
     this.state = {
-      // is_paused is used to track the paused/play button
       is_paused: false,
-      // is_active is used to check if we should render the normal UI, or a loading/empty screen
       is_active: false,
-      // what is player used?
       player: undefined,
-      // is_playing_left_track is created 
-      // to help check if left/right song is playing,
-      // in order to run a specific song.
       is_playing_left_track: true,
-      // left and right side track are used to grab rendering information, such as album name and artist name.
       left_side_track: track,
       right_side_track: track,
-      // previous_track is there to help with left_side/right_side track.
-      previous_track: false,
-      // when sending final playlist to spotify api to create a playlist, spotify receives an array of spotify uris
       final_playlist: [],
+      gametracks: [],
       made_move: false,
+      round: 0
     }
 
-    // handlePrevSong, handleNextSong are used for buttons in rendering and changing the current song that is played
-    this.handlePrevSong = this.handlePrevSong.bind(this);
-    this.handleNextSong = this.handleNextSong.bind(this);
-    // handleChoice is used to add song to this.state.final_playlist
+    this.playLeftSong = this.playLeftSong.bind(this);
+    this.playRightSong = this.playRightSong.bind(this);
     this.handleChoice = this.handleChoice.bind(this);
-    // submitPlaylist is used at the end of the app, to create a playlist and save to user's spotify account
     this.submitPlaylist = this.submitPlaylist.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
   }
@@ -76,8 +65,13 @@ class WebPlayback extends React.Component {
         console.log('Ready with Device ID', device_id);
 
         try {
-          await axios('/api/start/?' + new URLSearchParams({ device_id }));
+          const tracksArray = await axios('/api/start/?' + new URLSearchParams({ device_id })).then((response) => {
+            const data = response.data;
+            const { tracks }  = data;
+            return tracks;
+          });
           await axios('/api/playback/?' + new URLSearchParams({ device_id }));
+          this.setState({ gametracks: tracksArray });
         } catch(error) {
           console.log('Error: ', error);
         }
@@ -94,18 +88,37 @@ class WebPlayback extends React.Component {
 
         const {
           paused,
-          track_window: { current_track, next_tracks, previous_tracks }
+          track_window: { current_track, next_tracks }
         } = state;
 
-        const { is_playing_left_track } = this.state;
+        const { right_side_track, left_side_track, gametracks, round, final_playlist } = this.state;
 
-        previous_tracks.push(current_track);
+        let currentRound = round;
 
-        this.setState({
-          left_side_track: is_playing_left_track ? current_track : previous_tracks[0],
-          right_side_track: is_playing_left_track ? next_tracks[0] : current_track,
-          is_paused: paused
-        });
+        if (current_track.uri === gametracks[2 + (round * 2)]) {
+          currentRound += 1;
+        }
+
+        if (final_playlist.length !== currentRound && current_track.uri === gametracks[2 + (round * 2)]) {
+          player.previousTrack();
+          player.previousTrack();
+        }
+
+        if (current_track.uid === right_side_track.uid) {
+          this.setState({
+            left_side_track,
+            right_side_track: current_track,
+            is_paused: paused,
+            is_playing_left_track: false
+          });
+        } else {
+          this.setState({
+            left_side_track: current_track,
+            right_side_track: next_tracks[0],
+            is_paused: paused,
+            is_playing_left_track: true
+          });
+        }
         
         player.getCurrentState().then((state) => {
           (!state) ? this.setState({ is_active: false }) : this.setState({ is_active: true });
@@ -115,7 +128,7 @@ class WebPlayback extends React.Component {
     };
   };
 
-  handlePrevSong() {
+  playLeftSong() {
     const { is_playing_left_track, player } = this.state;
     if (is_playing_left_track) {
       player.seek(0).then(() => {
@@ -127,25 +140,39 @@ class WebPlayback extends React.Component {
     }
   }
 
-  handleNextSong() {
+  playRightSong() {
     const { is_playing_left_track, player, made_move } = this.state;
-    if (is_playing_left_track) {
+    if (is_playing_left_track && !made_move) {
       player.nextTrack();
-      this.setState({ is_playing_left_track: !is_playing_left_track });
+      this.setState({ is_playing_left_track: false });
     } else if (!made_move) {
-      alert('You must choose a song!');
-    } else {
-      player.nextTrack();
+      player.seek(0).then(() => {
+        console.log('Replaying Song!');
+      });
       this.setState({ is_playing_left_track: !is_playing_left_track });
     }
   }
 
   handleChoice(side) {
-    const { final_playlist, left_side_track, right_side_track } = this.state;
+    const { final_playlist, left_side_track, right_side_track, is_playing_left_track, player, round } = this.state;
     let updatedPlaylist = final_playlist;
     side === 'left-side' ? updatedPlaylist.push(left_side_track.uri) : updatedPlaylist.push(right_side_track.uri);
 
-    this.setState({final_playlist: updatedPlaylist, made_move: true});
+    if (is_playing_left_track) {
+      player.nextTrack();
+      player.nextTrack();
+    } else {
+      player.nextTrack();
+    }
+
+    // If this is the 5th round, it would be the last 2 songs, and this choice would create the playlist and submit it.
+    if (round === 4) {
+      this.setState({ final_playlist: updatedPlaylist });
+      this.submitPlaylist();
+      return;
+    }
+
+    this.setState({final_playlist: updatedPlaylist, is_playing_left_track: true, round: round + 1 });
   }
 
   async submitPlaylist() {
@@ -206,7 +233,7 @@ class WebPlayback extends React.Component {
             </section>
 
             <section className="player-buttons">
-              <button type="button" className="btn-spotify" onClick={this.handlePrevSong} >
+              <button type="button" className="btn-spotify" onClick={this.playLeftSong} >
                     Listen To Left Song
               </button>
 
@@ -218,7 +245,7 @@ class WebPlayback extends React.Component {
                   FINISH
               </button>
 
-              <button type="button" className="btn-spotify" onClick={this.handleNextSong} >
+              <button type="button" className="btn-spotify" onClick={this.playRightSong} >
                   Listen To Right Song
               </button>
             </section>
