@@ -36,8 +36,7 @@ class Main extends React.Component {
         <header className="app-header">
           <Nav pfp={pfp} name={name} />
         </header>
-        <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>
-        {genre ? <WebPlayback token={token} genre={genre} setToken={setToken} /> : ''}
+        {genre ? <WebPlayback token={token} genre={genre} setToken={setToken} /> : <GenreSelector handleGenreSelection={this.handleGenreSelection.bind(this)}/>}
       </div>
     );
   }

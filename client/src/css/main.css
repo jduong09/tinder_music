@@ -1,7 +1,8 @@
 .app-header {
   width: 100%;
   height: auto;
-  background-color: rgba(32, 30, 30, 1);
+  background-color: rgb(151, 89, 39);
+  color: black;
   margin-bottom: 1.5em;
 }
 

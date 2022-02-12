@@ -8,6 +8,7 @@ const Nav = ({ pfp, name }) => (
       <ul className="user-information">
         <li><img className="user-pfp" src={pfp} alt="user-pfp"/></li>
         <li className="user-name">{name}</li>
+        <li><a href="/auth/logout">Log Out</a></li>
       </ul> 
         :  
       <a className="login-button" href="/auth/login">

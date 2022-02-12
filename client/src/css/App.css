@@ -1,5 +1,5 @@
 body {
-  background-color: rgb(32, 30, 30, 1);
+  background-color: rgb(216, 162, 92);
   box-sizing: border-box;
 }
 
@@ -10,7 +10,6 @@ nav > img {
 
 h1 {
   font-size: 32px;
-  color: rgba(153, 3, 153, 0.644);
 }
 
 .main-wrapper {
@@ -23,16 +22,16 @@ h1 {
 
 .player-display {
   width: 30%;
-  border: 1px solid rgb(153, 3, 153, 0.644);
+  border: 1px solid rgb(151, 89, 39);
   border-radius: 5px;
-  background-color: rgb(153, 3, 153, 0.644);
+  background-color: rgb(151, 89, 39);
 }
 
 .player-display > img {
   width: 75%;
   height: auto;
   margin: 10px;
-  border: 1px solid rgb(153, 3, 153, 0.644);
+  border: 1px solid rgb(151, 89, 39);
   border-radius: 5px;
 }
 
@@ -61,7 +60,7 @@ h1 {
 .btn-spotify {
   padding: 5px;
   margin: 5px;
-  border: 1px solid rgba(153, 3, 153, 0.644);
+  border: 1px solid rgb(151, 89, 39);
   background-color: rgb(153, 3, 153, 0.644);
   color: black;
   border-radius: 5px;
@@ -81,8 +80,8 @@ h1 {
 .genre {
   width: 15%;
   height: auto;
-  background-color: rgba(153, 3, 153, 0.644);
-  border: 1px solid rgba(153, 3, 153, 0.644);
+  background-color: rgb(151, 89, 39);
+  border: 1px solid rgb(151, 89, 39);
   border-radius: 10px;
   padding: 10px;
 }
