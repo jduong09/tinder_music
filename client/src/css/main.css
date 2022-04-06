@@ -1,26 +1,20 @@
-.app-header {
-  width: 100%;
-  height: auto;
-  background-color: rgb(151, 89, 39);
-  color: black;
-  margin-bottom: 1.5em;
-}
-
-.app-header > nav {
+nav {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  border-bottom: 1px solid rgb(180, 180, 180);
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
+
+nav > h1 {
+  padding-left: 1rem;
+}
+
+#logo {
+  display: inline-block;
+  height: 3rem;
+  width: auto;
 }
 
 .user-information {
-  display: flex;
-  align-items: center;
-  color: white;
-}
-
-.user-pfp {
-  width: 50px;
-  height: auto;
-  border: 1px solid rgba(153, 3, 153, 0.644);
-  border-radius: 25px;
+  padding-right: 1rem;
 }

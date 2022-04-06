@@ -1,11 +1,5 @@
-body {
-  background-color: rgb(216, 162, 92);
-  box-sizing: border-box;
-}
-
-nav > img {
-  width: 30px;
-  height: 30px;
+html, body {
+  height: 100%;
 }
 
 h1 {
